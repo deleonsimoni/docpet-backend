@@ -38,7 +38,7 @@ api.buscaPorCRMV = function(req, res){
 api.adiciona = function(req, res){
     const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos } = req.body;
 
-    const veterinarioForm = {
+    let veterinarioForm = {
         nome: nome,
         crmv: crmv,
         contato: contato,
@@ -46,6 +46,9 @@ api.adiciona = function(req, res){
         atendePlano: atendePlano,
         especialidades: especialidades
     }
+    
+    veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     const estabelecimentosForm = estabelecimentos;
 
     model.create(veterinarioForm)

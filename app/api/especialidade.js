@@ -1,10 +1,13 @@
 mongoose = require('mongoose');
 
 var api = {};
-var model = mongoose.model('Especialidade');
+var especialidadeModel = mongoose.model('Especialidade');
+var estabelecimentoModel = mongoose.model('Estabelecimento');
+var veterinarioModel = mongoose.model('Veterinario');
+
 
 api.lista = function (req, res){
-    model.find({})
+    especialidadeModel.find({})
         .then(function(especialidades){
             res.json(especialidades);
         }, function(error){
@@ -12,6 +15,47 @@ api.lista = function (req, res){
             res.status(500).json(error);
         });
 }
+
+
+api.listAll = async function (req, res){
+    
+
+    let retorno = [];
+    let findRegex = req.query.search.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    await especialidadeModel.find({nomeFormated: { $regex: '.*' + findRegex + '.*', $options:'i' } }).select('nome nomeFormated')
+        .then(async function(especialidades){
+
+            retorno = [...retorno, ...especialidades.map(obj=> ({ ...obj._doc, type: 1 }))];
+
+            await  veterinarioModel.find({nomeFormated: { $regex: '.*' + findRegex + '.*', $options:'i' } }).select('nome nomeFormated')
+                .then(async function(veterinarios){
+
+                    retorno = [...retorno, ...veterinarios.map(obj=> ({ ...obj._doc, type: 2 }))];
+
+                    await   estabelecimentoModel.find({nomeFormated: { $regex: '.*' + findRegex + '.*', $options:'i' } }).select('nome nomeFormated')
+                    .then(async function(estabelecimento){
+
+                        res.json([...retorno, ...estabelecimento.map(obj=> ({ ...obj._doc, type: 3 }))]);
+
+                    }, function(error){
+                        console.log(error);
+                        res.status(500).json(error);
+                });
+
+
+            }, function(error){
+                console.log(error);
+                res.status(500).json(error);
+            });
+
+
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+}
+
 
 /* api.adiciona = function(req, res){
     model.create(req.body)

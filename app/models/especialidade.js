@@ -6,6 +6,10 @@ var schema = mongoose.Schema({
         type:String, 
         require: true
     },
+
+    nomeFormated:{
+        type:String, 
+    },
     
     descricao:{
         type:String,

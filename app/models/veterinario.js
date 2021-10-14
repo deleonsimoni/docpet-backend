@@ -7,6 +7,10 @@ var schema = mongoose.Schema({
         require:true
     },
 
+    nomeFormated:{
+        type:String, 
+    },
+
     crmv:{
         type:String,
         require:true

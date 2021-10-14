@@ -17,7 +17,7 @@ api.lista = function (req, res){
 api.adiciona = function(req, res){
     const {nome, cnpj, contato, endereco, atendePlano, especialidades, veterinarios } = req.body;
 
-    const estabelecimentoForm = {
+    let estabelecimentoForm = {
         nome: nome,
         cnpj: cnpj,
         contato: contato,
@@ -25,6 +25,9 @@ api.adiciona = function(req, res){
         atendePlano: atendePlano,
         especialidades: especialidades
     }
+
+    estabelecimentoForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     const veterinariosForm = veterinarios;
 
     model.create(estabelecimentoForm)
@@ -82,7 +85,7 @@ api.atualiza = async function(req, res){
 
     const {nome, cnpj, contato, endereco, atendePlano, especialidades, status, veterinarios } = req.body;
 
-    const estabelecimento = {
+    let estabelecimento = {
         nome: nome,
         cnpj: cnpj,
         contato: contato,
@@ -92,6 +95,9 @@ api.atualiza = async function(req, res){
         status: status,
         veterinarios: veterinarios
     }
+
+    estabelecimentoForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     const veterinariosForm = veterinarios;
      
     const newVeterinarios =  veterinariosForm || [];
@@ -206,19 +212,5 @@ api.atualiza = function(req, res){
         })
 }
 */
-
-function difference(A, B) {
-    const arrA = Array.isArray(A) ? A.map(x => x.toString()) : [A.toString()];
-    const arrB = Array.isArray(B) ? B.map(x => x.toString()) : [B.toString()];
-  
-    const result = [];
-    for (const p of arrA) {
-      if (arrB.indexOf(p) === -1) {
-        result.push(p);
-      }
-    }
-  
-    return result;
-  }
 
 module.exports = api;

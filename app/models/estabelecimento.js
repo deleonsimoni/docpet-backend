@@ -6,6 +6,9 @@ var schema = mongoose.Schema({
         type:String, 
         require: true
     },
+    nomeFormated:{
+        type:String, 
+    },
     cnpj:{
         type:String,
         require: true
