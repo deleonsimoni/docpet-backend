@@ -38,6 +38,13 @@ var schema = mongoose.Schema({
         require:true
     }],
 
+    estabelecimentos:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Estabelecimento',
+            require:true
+        }
+    ],
    
    contato:{
        email:{

@@ -5,11 +5,15 @@ module.exports= function(app){
     .get(api.lista)
     .post(api.adiciona);
 
-   app.route('/v1/veterinarios/crmv/:crmv')
+    app.route('/v1/veterinarios/crmv/:crmv')
     .get(api.buscaPorCRMV);
+    
+    app.route('/v1/veterinarios/especialidades/:id')
+    .get(api.byEspecialidade);
 
     app.route('/v1/veterinarios/:id')
     .get(api.buscaPorId)
+    .put(api.atualiza);
     /*.delete(api.removePorId)
     .put(api.atualiza);*/
 }

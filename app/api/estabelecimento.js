@@ -33,10 +33,24 @@ api.adiciona = function(req, res){
     model.create(estabelecimentoForm)
     .then(async function(estabelecimento){
         veterinariosForm.map(async vet =>{
-            delete vet._id;
-            const estabVet = new Veterinario({...vet})
-            estabVet.save();
-            estabelecimento.veterinarios.push(estabVet._id);
+            vet.estabelecimentos=[estabelecimento._id];
+            if(vet._id){
+                Veterinario.findByIdAndUpdate(vet._id, { $push: {estabelecimentos: estabelecimento._id}}, {new: true})
+                .then(async function(estabUpdate){
+                
+                }, function(error){
+                    console.log(error);
+                    res.status(500).json(error);
+                });
+                estabelecimento.veterinarios.push(vet._id);
+            
+            }else{
+                delete vet._id;
+                vet.nomeFormated = vet.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const estabVet = new Veterinario({...vet})
+                estabVet.save();
+                estabelecimento.veterinarios.push(estabVet._id);
+            }
         })
         await estabelecimento.save();
         res.json(estabelecimento);
@@ -80,7 +94,6 @@ api.buscarPorVeterinario = function (req, res){
 }
 
 api.atualiza = async function(req, res){
-    const idVetCriado = [];
     const _id = req.params.id;
 
     const {nome, cnpj, contato, endereco, atendePlano, especialidades, status, veterinarios } = req.body;
@@ -93,25 +106,32 @@ api.atualiza = async function(req, res){
         atendePlano: atendePlano,
         especialidades: especialidades,
         status: status,
-        veterinarios: veterinarios
+        veterinarios: []
     }
 
-    estabelecimentoForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    estabelecimento.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     const veterinariosForm = veterinarios;
-     
-    const newVeterinarios =  veterinariosForm || [];
     
-    const oldEstabelecimento = await model.findOne({ _id });
-
     await Promise.all(veterinariosForm.map(async vet =>{
-        if(!vet._id){
-            delete vet._id;
-            const estabVet = new Veterinario({...vet})
-            await estabVet.save();
-            vet._id = estabVet._id;
-            ///estabelecimento.veterinarios.push(vet);
-        }
+        vet.estabelecimentos=[_id];
+            if(vet._id){
+                Veterinario.findByIdAndUpdate(vet._id, { $push: {estabelecimentos: estabelecimento._id}}, {new: true})
+                .then(async function(estabUpdate){
+                
+                }, function(error){
+                    console.log(error);
+                    res.status(500).json(error);
+                });
+                estabelecimento.veterinarios.push(vet._id);
+            
+            }else{
+                delete vet._id;
+                vet.nomeFormated = vet.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const estabVet = new Veterinario({...vet})
+                estabVet.save();
+                estabelecimento.veterinarios.push(estabVet._id);
+            }
     }));
     
     await model.findOneAndUpdate({ _id }, estabelecimento, {new: true}).then(async function(estab){
@@ -121,70 +141,6 @@ api.atualiza = async function(req, res){
         console.log(error);
         res.status(500).json(error);
     });
-
-    
-    /*const oldVeterinarios = oldEstabelecimento.veterinarios;
-      const returnedTarget = Object.assign(oldEstabelecimento, estabelecimento);
-    */
-    //const newEstabelecimento = await oldEstabelecimento.save();
-  
-    //const added = difference(newVeterinarios, oldCategorias);
-   // const removed = difference(oldCategorias, newVeterinarios);
-
-    //await Category.updateMany({ '_id': added }, { $addToSet: { estabelecimentos: foundEstabelecimento._id } });
-    //await Category.updateMany({ '_id': removed }, { $pull: { estabelecimentos: foundEstabelecimento._id } });
-  
-    //return res.send(estabelecimento);
-
-    /*
-    model.findByIdAndUpdate(req.params.id, estabelecimentoForm)
-        .then(async function(estabelecimento){
-            
-            estabelecimento.veterinarios = [];
-
-
-            var id = mongoose.Types.ObjectId(estabelecimento._id);
-            
-            console.log(veterinariosForm);
-
-            await Veterinario.find({'estabelecimentos': id }).then(async function(vet){
-                console.log("Vet" + vet); 
-            })
-            
-            //Veterinario.update({ },{ $pull: { estabelecimentos : { $in: [estabelecimento._id]}}}, { multi: true });
-                
-                
-            /*veterinariosForm.map(async vet =>{
-                const estabVet = new Veterinario({...vet, estabelecimentos:[estabelecimento._id]})
-                estabVet.save();
-                estabelecimento.veterinarios.push(estabVet._id);
-            })
-        await estabelecimento.save();
-        console.log("Estabelecimento: "+estabelecimento); 
-        res.json(estabelecimento);
-
-     }, function(error){
-            console.log(error);
-            res.status(500).json(error);
-        }) */
-
-         /**1 - verificar se veterinário já existe e atualizar */
-    /*await estabelecimento.veterinarios.forEach(async vet => {
-        Veterinario.findOne({nome: vet.nome, crmv: vet.crmv}).then(async function(isVet){
-            console.log(isVet);
-            if(isVet){
-                console.log('Tem');
-            } else{
-                console.log('Nao');
-                const estabVet = new Veterinario({...vet, estabelecimentos:[_id]})
-                estabVet.save();
-                idVetCriado.push(estabVet._id);
-                console.log(idVetCriado);
-            }
-        });    
-    }); */
-    
-    //console.log(idVetCriado);
    
 }
 
