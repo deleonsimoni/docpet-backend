@@ -11,6 +11,9 @@ module.exports= function(app){
     app.route('/v1/veterinarios/especialidades/:id')
     .get(api.byEspecialidade);
 
+    app.route('/v1/veterinarios/perfil/:nomeFormated')
+    .get(api.byName);
+
     app.route('/v1/veterinarios/:id')
     .get(api.buscaPorId)
     .put(api.atualiza);

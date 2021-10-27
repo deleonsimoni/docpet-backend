@@ -14,6 +14,15 @@ api.lista = function (req, res){
         });
 }
 
+api.byName = function (req, res){
+    model.findOne({nomeFormated: req.params.nomeFormated})
+        .then(function(veterinarios){
+            res.json(veterinarios);
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+}
 api.byEspecialidade = function (req, res){
     model.find({especialidades : req.params.id}).populate('especialidades').populate('estabelecimentos')
         .then(function(veterinarios){
