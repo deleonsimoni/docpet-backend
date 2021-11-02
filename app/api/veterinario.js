@@ -55,7 +55,7 @@ api.buscaPorCRMV = function(req, res){
 };
 
 api.adiciona = function(req, res){
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -63,7 +63,8 @@ api.adiciona = function(req, res){
         contato: contato,
         endereco: endereco,
         atendePlano: atendePlano,
-        especialidades: especialidades
+        especialidades: especialidades,
+        status: status
     }
     
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -103,7 +104,7 @@ api.adiciona = function(req, res){
     console.log('**** Alterando Veterinario ****');
     console.log('**** ID: req.params.id  ****');
     const _id = req.params.id;
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -112,7 +113,8 @@ api.adiciona = function(req, res){
         endereco: endereco,
         atendePlano: atendePlano,
         especialidades: especialidades,
-        estabelecimentos: []
+        estabelecimentos: [],
+        status: status
 
     }
     
@@ -132,13 +134,17 @@ api.adiciona = function(req, res){
                 res.status(500).json(error);
             });
             veterinarioForm.estabelecimentos.push(_id);
+
         }else{
             delete estab._id;
-            estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const estabModel = new Estabelecimento({...estab})
-            estabModel.save();
-            veterinarioForm.estabelecimentos.push(estabModel._id);
-            console.log('     **** Criando Estabelecimento  ****');
+            if(estab.nome){
+                estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const estabModel = new Estabelecimento({...estab})
+                estabModel.save();
+                veterinarioForm.estabelecimentos.push(estabModel._id);
+                console.log('     **** Criando Estabelecimento  ****');
+            }
+            
         }
     }));
     
