@@ -7,7 +7,7 @@ var veterinarioModel = mongoose.model('Veterinario');
 
 
 api.lista = function (req, res){
-    especialidadeModel.find({})
+    especialidadeModel.find({}).sort({nome: 'asc'})
         .then(function(especialidades){
             res.json(especialidades);
         }, function(error){
@@ -16,6 +16,29 @@ api.lista = function (req, res){
         });
 }
 
+api.listaTotalEspcEstab = async function(req, res){
+    let ret = [];
+
+    await especialidadeModel.find({}).sort({nome: 'asc'})
+    .then(async function(especialidades){
+        let totalEstab = 0;
+        await Promise.all(especialidades.map(async especialidade =>{
+            await veterinarioModel.find({especialidades : especialidade._id}).count().then(async function (count) {
+                await estabelecimentoModel.find({especialidades : especialidade._id}).count().then(async function (countEstab) {
+                    totalEstab = countEstab;
+                });
+
+                ret.push({...especialidade._doc, 'totalVet':count, 'totalEstab':totalEstab});
+            });
+        }));
+        //ret = [{...especialidades, totalVet}];
+        res.json(ret);
+        console.log(ret); 
+    }, function(error){
+        console.log(error);
+        res.status(500).json(error);
+    });
+}
 
 api.listAll = async function (req, res){
     

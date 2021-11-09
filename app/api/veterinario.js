@@ -5,7 +5,7 @@ var model = mongoose.model('Veterinario');
 var Estabelecimento = mongoose.model('Estabelecimento');
 
 api.lista = function (req, res){
-    model.find({})
+    model.find({}).populate('especialidades')
         .then(function(veterinarios){
             res.json(veterinarios);
         }, function(error){

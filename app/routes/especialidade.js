@@ -4,7 +4,10 @@ module.exports= function(app){
 
     app.route('/v1/especialidades')
     .get(api.lista);
-
+    
+    app.route('/v1/especialidades/total')
+    .get(api.listaTotalEspcEstab);
+    
     app.route('/v1/especialidades/search')
     .get(api.listAll);
    // .post(api.adiciona);
