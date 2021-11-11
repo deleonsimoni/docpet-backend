@@ -5,6 +5,9 @@ module.exports= function(app){
     .get(api.lista)
     .post(api.adiciona);
 
+    app.route('/v1/veterinarios/cep/:cep')
+    .get(api.cepToLocale);
+
     app.route('/v1/veterinarios/crmv/:crmv')
     .get(api.buscaPorCRMV);
     

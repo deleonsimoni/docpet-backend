@@ -1,5 +1,6 @@
 var http = require('http');
 var app = require('./config/express');
+require('dotenv').config();
 var porta = process.env.PORT_VETZCO_API_SERVER || 3001 
 require('./config/database')('localhost/pet');
 /*require('./config/database')('mongo71-farm10.kinghost.net/vetzco01', 

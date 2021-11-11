@@ -13,6 +13,14 @@ var schema = mongoose.Schema({
         type:String,
         require: true
     },
+
+    location: {
+        type: {
+            type: String,
+            default: "Point"
+        },
+        coordinates: []
+    },
     dtCriacao:{
         type: Date,
         default: Date.now

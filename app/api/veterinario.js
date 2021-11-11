@@ -1,4 +1,5 @@
 mongoose = require('mongoose');
+const MapsService = require('../services/service-maps');
 
 var api = {};
 var model = mongoose.model('Veterinario');
@@ -54,7 +55,11 @@ api.buscaPorCRMV = function(req, res){
         });
 };
 
-api.adiciona = function(req, res){
+api.cepToLocale = async function(req, res){
+    return res.json(await MapsService.getLocaleByCEP(JSON.parse(req.params.cep)));
+};
+
+api.adiciona = async function(req, res){
     const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status } = req.body;
 
     let veterinarioForm = {
@@ -66,7 +71,14 @@ api.adiciona = function(req, res){
         especialidades: especialidades,
         status: status
     }
-    
+
+    if(endereco && endereco.cep){
+        const point = await MapsService.getLocaleByCEP(endereco.cep);
+        veterinarioForm.location = {
+            coordinates: [point.lng, point.lat]
+          }
+    }
+
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     const estabelecimentosForm = estabelecimentos;
