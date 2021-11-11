@@ -34,6 +34,19 @@ api.byEspecialidade = function (req, res){
         });
 }
 
+api.byEspecialidadeMunicipio = function (req, res){
+    console.log('ID-ESPC', req.params.id);
+    console.log('MUNICIP', req.params.municipio);
+
+    model.find({especialidades : req.params.id, endereco : {municipio : req.params.municipio}}).populate('especialidades').populate('estabelecimentos')
+        .then(function(veterinarios){
+            res.json(veterinarios);
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+}
+
 api.buscaPorId = function(req, res){
     model.findById(req.params.id)
         .then(function(veterinario){
