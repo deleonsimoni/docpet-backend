@@ -22,7 +22,7 @@ async function getLocaleByCEP(address) {
 
 }
 
-async function getLocale(cep) {
+async function getLocale(search) {
 
     try {
         const neighborhood = 'chelsea'
