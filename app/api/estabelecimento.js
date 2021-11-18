@@ -1,4 +1,5 @@
 mongoose = require('mongoose');
+const MapsService = require('../services/service-maps');
 
 var api = {};
 var model = mongoose.model('Estabelecimento');
@@ -93,6 +94,10 @@ api.buscarPorVeterinario = function (req, res){
         });
 }
 
+api.cepToLocale = async function(req, res){
+    return res.json(await MapsService.getLocaleByCEP(JSON.parse(req.params.cep)));
+};
+
 api.atualiza = async function(req, res){
     const _id = req.params.id;
 
@@ -110,6 +115,13 @@ api.atualiza = async function(req, res){
     }
 
     estabelecimento.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    if(endereco && endereco.cep){
+        const point = await MapsService.getLocaleByCEP(endereco.cep);
+        estabelecimento.location = {
+            coordinates: [point.lng, point.lat]
+          }
+    }
 
     const veterinariosForm = veterinarios;
     

@@ -6,14 +6,14 @@ const key = process.env.TOKEN_GMAPS;
 async function getLocaleByCEP(address) {
 
     let addressMaps = address.logradouro + ', ' + address.numero + ' - ' + address.bairro + ', ' + address.municipio + ' - ' + address.estado + ', ' + address.cep;
-    addressMaps = addressMaps.replace(/[^a-zA-Z ]/g, "")
-
+    addressMaps = addressMaps.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    
     try {
         const data = await axios.get(
             `https://maps.googleapis.com/maps/api/geocode/json?address=${addressMaps}&key=${key}`
         )
+        
        return data.data.results[0].geometry.location;
-
     }
     catch (err) {
         console.log('ERRO AO BUSCAR LOCALE POR CEP -> ' + err);
