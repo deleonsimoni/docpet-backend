@@ -1,4 +1,5 @@
 mongoose = require('mongoose');
+const MapsService = require('../services/service-maps');
 
 var api = {};
 var model = mongoose.model('Estabelecimento');
@@ -92,6 +93,10 @@ api.buscarPorVeterinario = function (req, res){
             res.status(500).json(error);
         });
 }
+
+api.cepToLocale = async function(req, res){
+    return res.json(await MapsService.getLocaleByCEP(JSON.parse(req.params.cep)));
+};
 
 api.atualiza = async function(req, res){
     const _id = req.params.id;

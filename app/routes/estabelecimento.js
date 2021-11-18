@@ -13,6 +13,9 @@ module.exports= function(app){
     app.route('/v1/estabelecimentos/:id')
     .get(api.buscaPorId)
     .put(api.atualiza);
+
+    app.route('/v1/estabelecimentos/cep/:cep')
+    .get(api.cepToLocale);
     /*.delete(api.removePorId)
     .put(api.atualiza); */
 }
