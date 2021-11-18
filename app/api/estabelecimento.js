@@ -111,6 +111,13 @@ api.atualiza = async function(req, res){
 
     estabelecimento.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+    if(endereco && endereco.cep){
+        const point = await MapsService.getLocaleByCEP(endereco.cep);
+        estabelecimento.location = {
+            coordinates: [point.lng, point.lat]
+          }
+    }
+
     const veterinariosForm = veterinarios;
     
     await Promise.all(veterinariosForm.map(async vet =>{
