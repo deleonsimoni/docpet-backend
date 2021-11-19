@@ -16,7 +16,7 @@ api.lista = function (req, res){
 }
 
 api.byName = function (req, res){
-    model.findOne({nomeFormated: req.params.nomeFormated})
+    model.findOne({nomeFormated: req.params.nomeFormated}).populate('especialidades').populate('estabelecimentos')
         .then(function(veterinarios){
             res.json(veterinarios);
         }, function(error){
