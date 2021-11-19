@@ -8,6 +8,9 @@ module.exports= function(app){
     app.route('/v1/veterinarios/cep/:cep')
     .get(api.cepToLocale);
 
+    app.route('/v1/veterinarios/locale/:search')
+    .get(api.locale);
+
     app.route('/v1/veterinarios/crmv/:crmv')
     .get(api.buscaPorCRMV);
     

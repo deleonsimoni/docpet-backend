@@ -33,11 +33,11 @@ api.listaTotalEspcEstab = async function(req, res){
         }));
         //ret = [{...especialidades, totalVet}];
         res.json(ret);
-        console.log(ret); 
     }, function(error){
         console.log(error);
         res.status(500).json(error);
     });
+    
 }
 
 api.listAll = async function (req, res){

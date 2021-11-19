@@ -34,11 +34,26 @@ api.byEspecialidade = function (req, res){
         });
 }
 
-api.byEspecialidadeMunicipio = function (req, res){
-    console.log('ID-ESPC', req.params.id);
-    console.log('MUNICIP', req.params.municipio);
+api.byEspecialidadeMunicipio = async function (req, res){
+   
+    let geometry = await MapsService.getLocaleFromPlaceID(req.params.municipio);
 
-    model.find({especialidades : req.params.id, endereco : {municipio : req.params.municipio}}).populate('especialidades').populate('estabelecimentos')
+    model.find({$and: [
+
+        {especialidades : req.params.id}, 
+        {'location': 
+            {$near: {
+                $geometry: {
+                type: "Point" ,
+                coordinates: [ geometry.lng, geometry.lat]
+                },
+            $maxDistance: 20000}
+        }
+    },
+    ]})
+
+    .populate('especialidades')
+    .populate('estabelecimentos')
         .then(function(veterinarios){
             res.json(veterinarios);
         }, function(error){
@@ -72,6 +87,10 @@ api.cepToLocale = async function(req, res){
     return res.json(await MapsService.getLocaleByCEP(JSON.parse(req.params.cep)));
 };
 
+api.locale = async function(req, res){
+    return res.json(await MapsService.getLocale(req.params.search));
+};
+
 api.adiciona = async function(req, res){
     const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status } = req.body;
 
@@ -86,7 +105,7 @@ api.adiciona = async function(req, res){
     }
 
     if(endereco && endereco.cep){
-        const point = await MapsService.getLocaleByCEP(endereco.cep);
+        const point = await MapsService.getLocaleByCEP(endereco);
         veterinarioForm.location = {
             coordinates: [point.lng, point.lat]
           }
