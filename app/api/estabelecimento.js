@@ -4,6 +4,7 @@ const MapsService = require('../services/service-maps');
 var api = {};
 var model = mongoose.model('Estabelecimento');
 var Veterinario = mongoose.model('Veterinario');
+var point = {}
 
 api.lista = function (req, res){
     model.find({}).populate('veterinarios').populate('especialidades')
@@ -15,7 +16,7 @@ api.lista = function (req, res){
         });
 }
 
-api.adiciona = function(req, res){
+api.adiciona = async function(req, res){
     const {nome, cnpj, contato, endereco, atendePlano, especialidades, veterinarios } = req.body;
 
     let estabelecimentoForm = {
@@ -25,6 +26,13 @@ api.adiciona = function(req, res){
         endereco: endereco,
         atendePlano: atendePlano,
         especialidades: especialidades
+    }
+    
+    if(endereco && endereco.cep){
+        point = await MapsService.getLocaleByCEP(endereco);
+        estabelecimentoForm.location = {
+            coordinates: [point.lng, point.lat]
+        }
     }
 
     estabelecimentoForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -48,6 +56,9 @@ api.adiciona = function(req, res){
             }else{
                 delete vet._id;
                 vet.nomeFormated = vet.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                vet.location = {
+                    coordinates: [point.lng, point.lat]
+                }
                 const estabVet = new Veterinario({...vet})
                 estabVet.save();
                 estabelecimento.veterinarios.push(estabVet._id);
@@ -84,7 +95,6 @@ api.buscaPorCNPJ = function(req, res){
 };
 
 api.buscarPorVeterinario = function (req, res){
-    console.log(req.params.id);
     model.find({veterinarios: req.params.id})
         .then(function(estabelecimentos){
             res.json(estabelecimentos);
@@ -117,10 +127,11 @@ api.atualiza = async function(req, res){
     estabelecimento.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     if(endereco && endereco.cep){
-        const point = await MapsService.getLocaleByCEP(endereco.cep);
+        point = await MapsService.getLocaleByCEP(endereco);
         estabelecimento.location = {
+            type: 'Point',
             coordinates: [point.lng, point.lat]
-          }
+        }
     }
 
     const veterinariosForm = veterinarios;
@@ -140,6 +151,11 @@ api.atualiza = async function(req, res){
             }else{
                 delete vet._id;
                 vet.nomeFormated = vet.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                vet.location = {
+                    coordinates: [point.lng, point.lat]
+                }
+
                 const estabVet = new Veterinario({...vet})
                 estabVet.save();
                 estabelecimento.veterinarios.push(estabVet._id);
@@ -148,7 +164,6 @@ api.atualiza = async function(req, res){
     
     await model.findOneAndUpdate({ _id }, estabelecimento, {new: true}).then(async function(estab){
         res.json(estab);
-
     }, function(error){
         console.log(error);
         res.status(500).json(error);

@@ -4,9 +4,10 @@ const MapsService = require('../services/service-maps');
 var api = {};
 var model = mongoose.model('Veterinario');
 var Estabelecimento = mongoose.model('Estabelecimento');
+var point = {}
 
 api.lista = function (req, res){
-    model.find({}).populate('especialidades')
+    model.find({}).populate('especialidades').populate('estabelecimentos')
         .then(function(veterinarios){
             res.json(veterinarios);
         }, function(error){
@@ -63,7 +64,7 @@ api.byEspecialidadeMunicipio = async function (req, res){
 }
 
 api.buscaPorId = function(req, res){
-    model.findById(req.params.id)
+    model.findById(req.params.id).populate('estabelecimentos')
         .then(function(veterinario){
             if(!veterinario) throw Error('Veterinário não localizado');
             res.json(veterinario);
@@ -105,7 +106,7 @@ api.adiciona = async function(req, res){
     }
 
     if(endereco && endereco.cep){
-        const point = await MapsService.getLocaleByCEP(endereco);
+        point = await MapsService.getLocaleByCEP(endereco);
         veterinarioForm.location = {
             coordinates: [point.lng, point.lat]
           }
@@ -130,6 +131,10 @@ api.adiciona = async function(req, res){
                 veterinario.estabelecimentos.push(_id);
             }else{
                 delete estab._id;
+                estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                estab.location = {
+                    coordinates: [point.lng, point.lat]
+                }
                 const estabModel = new Estabelecimento({...estab})
                 estabModel.save();
                 veterinario.estabelecimentos.push(estabModel._id);
@@ -145,8 +150,6 @@ api.adiciona = async function(req, res){
  }
 
  api.atualiza = async function(req, res){
-    console.log('**** Alterando Veterinario ****');
-    console.log('**** ID: req.params.id  ****');
     const _id = req.params.id;
     const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos } = req.body;
 
@@ -164,14 +167,21 @@ api.adiciona = async function(req, res){
     
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+    if(endereco && endereco.cep){
+        point = await MapsService.getLocaleByCEP(endereco);
+        veterinarioForm.location = {
+            type: 'Point',
+            coordinates: [point.lng, point.lat]
+        }
+    }
+
     const estabelecimentosForm = estabelecimentos;
-    
+
     await Promise.all(estabelecimentosForm.map(async estab =>{
         estab.veterinarios=[_id];
         if(estab._id){
             const _id = estab._id;
             Estabelecimento.findByIdAndUpdate(_id, { $push: {veterinarios: _id}}, {new: true}).then(async function(estabUpdate){
-                console.log('     **** Atualizando Estabelecimento  ****');
 
             }, function(error){
                 console.log(error);
@@ -181,20 +191,21 @@ api.adiciona = async function(req, res){
 
         }else{
             delete estab._id;
-            if(estab.nome){
-                estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                const estabModel = new Estabelecimento({...estab})
-                estabModel.save();
-                veterinarioForm.estabelecimentos.push(estabModel._id);
-                console.log('     **** Criando Estabelecimento  ****');
+        
+            estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            estab.location = {
+                coordinates: [point.lng, point.lat]
             }
+            const estabModel = new Estabelecimento({...estab})
+            estabModel.save();
+            veterinarioForm.estabelecimentos.push(estabModel._id);
+            
             
         }
     }));
     
     await model.findOneAndUpdate({ _id }, veterinarioForm, {new: true}).then(async function(vet){
         res.json(vet);
-        console.log('**** Fim da alteração ****');
     }, function(error){
         console.log(error);
         res.status(500).json(error);
