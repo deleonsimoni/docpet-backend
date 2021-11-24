@@ -39,6 +39,64 @@ var schema = mongoose.Schema({
         require: true,
         default: true
     },
+    
+    sobre:{
+        type:String,
+        require:true
+    },
+
+    formacoes:[{
+        nomeInstituicao:{
+            type:String,
+            require:true
+        },
+        curso:{
+            type:String,
+            require:true
+        },
+        anoInicio:{
+            type:Number,
+            require:true
+        },
+        anoFim:{
+            type:Number,
+            require:true
+        }
+    }],
+
+    experiencias:[{
+        nomeEstabelecimento:{
+            type:String,
+            require:true
+        },
+        anoInicio:{
+            type:Number,
+            require:true
+        },
+        anoFim:{
+            type:Number,
+            require:true
+        }
+    }],
+
+    conquistas:[{
+        nome:{
+            type:String,
+            require:true
+        },
+        mes:{
+            type:Number,
+            require:true
+        },
+        ano:{
+            type:Number,
+            require:true
+        },
+        descricao:{
+            type:String,
+            require:true
+        }
+    }],
 
     especialidades:[{
         type: mongoose.Schema.Types.ObjectId,
@@ -54,6 +112,7 @@ var schema = mongoose.Schema({
         }
     ],
    
+
    contato:{
        email:{
            type:String,

@@ -18,8 +18,8 @@ api.lista = function (req, res){
 
 api.byName = function (req, res){
     model.findOne({nomeFormated: req.params.nomeFormated}).populate('especialidades').populate('estabelecimentos')
-        .then(function(veterinarios){
-            res.json(veterinarios);
+        .then(function(veterinario){
+            res.json(veterinario);
         }, function(error){
             console.log(error);
             res.status(500).json(error);
@@ -93,7 +93,7 @@ api.locale = async function(req, res){
 };
 
 api.adiciona = async function(req, res){
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -102,7 +102,11 @@ api.adiciona = async function(req, res){
         endereco: endereco,
         atendePlano: atendePlano,
         especialidades: especialidades,
-        status: status
+        status: status,
+        sobre:sobre,
+        formacoes:formacoes,
+        experiencias:experiencias,
+        conquistas:conquistas 
     }
 
     if(endereco && endereco.cep){
@@ -151,7 +155,7 @@ api.adiciona = async function(req, res){
 
  api.atualiza = async function(req, res){
     const _id = req.params.id;
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -161,7 +165,11 @@ api.adiciona = async function(req, res){
         atendePlano: atendePlano,
         especialidades: especialidades,
         estabelecimentos: [],
-        status: status
+        status: status,
+        sobre:sobre,
+        formacoes:formacoes,
+        experiencias:experiencias,
+        conquistas:conquistas
 
     }
     
