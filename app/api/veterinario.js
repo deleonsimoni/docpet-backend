@@ -93,7 +93,7 @@ api.locale = async function(req, res){
 };
 
 api.adiciona = async function(req, res){
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -106,7 +106,8 @@ api.adiciona = async function(req, res){
         sobre:sobre,
         formacoes:formacoes,
         experiencias:experiencias,
-        conquistas:conquistas 
+        conquistas:conquistas,
+        img: img
     }
 
     if(endereco && endereco.cep){
@@ -155,7 +156,7 @@ api.adiciona = async function(req, res){
 
  api.atualiza = async function(req, res){
     const _id = req.params.id;
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -169,7 +170,8 @@ api.adiciona = async function(req, res){
         sobre:sobre,
         formacoes:formacoes,
         experiencias:experiencias,
-        conquistas:conquistas
+        conquistas:conquistas,
+        img: img
 
     }
     

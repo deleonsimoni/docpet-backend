@@ -11,6 +11,10 @@ var schema = mongoose.Schema({
         type:String, 
     },
 
+    img:{
+        type:String, 
+    },
+
     crmv:{
         type:String,
         require:true
