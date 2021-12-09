@@ -48,7 +48,7 @@ api.byEspecialidadeMunicipio = async function (req, res){
                 type: "Point" ,
                 coordinates: [ geometry.lng, geometry.lat]
                 },
-            $maxDistance: 20000}
+            $maxDistance: 2000000}
         }
     },
     ]})
