@@ -1,7 +1,8 @@
    module.exports = function(app){
-
+   const jwt = require('jsonwebtoken');
    var mongoose = require('mongoose');
-   var jwt = require('jsonwebtoken');
+   require('dotenv').config();
+
    var api = {};
    var model = mongoose.model('Usuario');
 
@@ -13,7 +14,7 @@
             res.sendStatus(401);
 
          } else{
-            var token = jwt.sign({login:usuario.login}, app.get('secret'), {
+            var token = jwt.sign({login:usuario.login}, process.env.SECRET, {
                expiresIn: 84600
             });
 
@@ -33,7 +34,7 @@
       var token = req.headers['x-access-token'];
       console.log('Verificando Token...')
       if(token){
-         jwt.verify(token, app.get('secret'), function(err, decoded){
+         jwt.verify(token, process.env.SECRET, function(err, decoded){
             if(err){
                console.log('Token rejeitado');
                res.sendStatus(401);
