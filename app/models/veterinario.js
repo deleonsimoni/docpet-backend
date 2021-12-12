@@ -20,6 +20,11 @@ var schema = mongoose.Schema({
         require:true
     },
 
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario'
+    },
+
     location: {
         type: {
             type: String,

@@ -1,10 +1,13 @@
 var mongoose = require('mongoose');
 
 var schema = mongoose.Schema({
-    fullname: {
+    nome: {
       type: String,
       required: true,
     },
+    img:{
+      type:String, 
+  },
     email: {
       type: String,
       required: true,
@@ -23,10 +26,15 @@ var schema = mongoose.Schema({
       type: Date,
       default: Date.now,
     },
-    //0 - Admin / 1 - Veterinario / 2 - Clinica
-    roles: 
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    //0 - User / 1 - Veterinario / 2 - Clinica
+    role: 
       {
         type: Number,
+        default: 0,
       },
   },
   {

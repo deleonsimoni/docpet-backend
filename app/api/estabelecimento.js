@@ -17,6 +17,9 @@ api.lista = function (req, res){
 }
 
 api.adiciona = async function(req, res){
+    if(!req.body){
+        req.body = req;
+    }
     const {nome, cnpj, contato, endereco, atendePlano, especialidades, veterinarios } = req.body;
 
     let estabelecimentoForm = {
@@ -26,6 +29,10 @@ api.adiciona = async function(req, res){
         endereco: endereco,
         atendePlano: atendePlano,
         especialidades: especialidades
+    }
+
+    if(req.id){
+        veterinarioForm.user = req.body.id;
     }
     
     if(endereco && endereco.cep){
@@ -65,7 +72,11 @@ api.adiciona = async function(req, res){
             }
         })
         await estabelecimento.save();
-        res.json(estabelecimento);
+        if(req.body.id){
+            return true;
+        } else {
+            res.json(estabelecimento);
+        }
 
      }, function(error){
          console.log(error);
