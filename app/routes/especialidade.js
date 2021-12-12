@@ -3,7 +3,14 @@ module.exports= function(app){
     var api = app.api.especialidade;
 
     app.route('/v1/especialidades')
-    .get(api.lista);
+    .get(api.lista)
+    .post(api.adicionaEspecialidade)
+
+
+    app.route('/v1/especialidades/:id')
+    .put(api.atualizaEspecialidade)
+    .delete(api.removeEspecialidadePorId);
+
     
     app.route('/v1/especialidades/total')
     .get(api.listaTotalEspcEstab);
