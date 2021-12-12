@@ -27,6 +27,10 @@ module.exports= function(app){
     app.route('/v1/veterinarios/:id')
     .get(api.buscaPorId)
     .put(api.atualiza);
+
+    app.route('/v1/veterinarios/review/:id')
+    .get(api.getReview)
+    .post(api.createReview);
     /*.delete(api.removePorId)
     .put(api.atualiza);*/
 }

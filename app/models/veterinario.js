@@ -168,8 +168,29 @@ var schema = mongoose.Schema({
        cep:{
            type:String,
            require: true
-       },
+       }
    },
+
+   reviews: [{
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      score: {
+          type: Number
+      },
+      description: {
+          type: String
+      },
+      cellphone: {
+          type: String
+      }
+   }]
+
 });
 
 mongoose.model('Veterinario', schema);
