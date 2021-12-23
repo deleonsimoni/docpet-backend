@@ -183,11 +183,17 @@ var schema = mongoose.Schema({
       score: {
           type: Number
       },
+      nameUser: {
+        type: String
+      },
       description: {
           type: String
       },
       cellphone: {
           type: String
+      },
+      like: {
+          type: Boolean
       }
    }]
 
