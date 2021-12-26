@@ -1,4 +1,5 @@
 mongoose = require('mongoose');
+const estabelecimento = require('../routes/estabelecimento');
 const MapsService = require('../services/service-maps');
 
 var api = {};
@@ -84,6 +85,17 @@ api.buscaPorId = function(req, res){
         })
 }
 
+api.buscaPorUsuario = function(req, res){
+    model.findOne({user: req.params.id}).populate('estabelecimentos').populate('especialidades')
+        .then(function(veterinario){
+           if(!veterinario) throw Error('Veterinário não localizado');
+            res.json(veterinario);
+        }, function(error){
+            console.log(error);
+            res.status(404).json(error);
+        })
+}
+
 api.buscaPorCRMV = function(req, res){
     model.findOne({crmv: req.params.crmv})
         .then(async function(veterinario){
@@ -117,7 +129,7 @@ api.adiciona = async function(req, res){
         endereco: endereco,
         atendePlano: atendePlano,
         especialidades: especialidades,
-        status: status,
+        status: status ? true : false,
         sobre:sobre,
         formacoes:formacoes,
         experiencias:experiencias,
@@ -128,42 +140,49 @@ api.adiciona = async function(req, res){
     if(req.id){
         veterinarioForm.user = req.body.id;
     }
-
+    
     if(endereco && endereco.cep){
         point = await MapsService.getLocaleByCEP(endereco);
         veterinarioForm.location = {
+            "type": "Point",
             coordinates: [point.lng, point.lat]
           }
     }
 
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const estabelecimentosForm = estabelecimentos;
+    const estabelecimentosForm = [];
 
+    if(estabelecimentos.length && estabelecimentos[0].cnpj !== ""){
+        estabelecimentosForm = estabelecimentos;
+    }
+    
     model.create(veterinarioForm)
     .then(async function(veterinario){
+        
         estabelecimentosForm.map(async estab =>{
             estab.veterinarios=[veterinario._id];
-            if(estab._id){
-                const _id = estab._id;
-                Estabelecimento.findByIdAndUpdate(_id, { $push: {veterinarios: veterinario._id}}, {new: true}).then(async function(estabUpdate){
-                
-                }, function(error){
-                    console.log(error);
-                    res.status(500).json(error);
-                });
-                veterinario.estabelecimentos.push(_id);
-            }else{
-                delete estab._id;
-                estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                estab.location = {
-                    coordinates: [point.lng, point.lat]
+                if(estab._id){
+                    const _id = estab._id;
+                    Estabelecimento.findByIdAndUpdate(_id, { $push: {veterinarios: veterinario._id}}, {new: true}).then(async function(estabUpdate){
+                    
+                    }, function(error){
+                        console.log(error);
+                        res.status(500).json(error);
+                    });
+                    veterinario.estabelecimentos.push(_id);
+                }else{
+                    delete estab._id;
+                    estab.nomeFormated = estab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    estab.location = {
+                        coordinates: [point.lng, point.lat]
+                    }
+                    const estabModel = new Estabelecimento({...estab})
+                    estabModel.save();
+                    veterinario.estabelecimentos.push(estabModel._id);
                 }
-                const estabModel = new Estabelecimento({...estab})
-                estabModel.save();
-                veterinario.estabelecimentos.push(estabModel._id);
-            }
         })
+
         await veterinario.save();        
         if(req.body.id){
             return true;
@@ -207,8 +226,12 @@ api.adiciona = async function(req, res){
             coordinates: [point.lng, point.lat]
         }
     }
+    
+    const estabelecimentosForm = [];
 
-    const estabelecimentosForm = estabelecimentos;
+    if(estabelecimentos.length && estabelecimentos[0].cnpj !== ""){
+        estabelecimentosForm = estabelecimentos;
+    }
 
     await Promise.all(estabelecimentosForm.map(async estab =>{
         estab.veterinarios=[_id];

@@ -26,11 +26,8 @@ var schema = mongoose.Schema({
     },
 
     location: {
-        type: {
-            type: String,
-            default: "Point"
-        },
-        coordinates: []
+        type: { type: String },
+        coordinates: { type: [], default: undefined }
     },
 
     dtCriacao:{
