@@ -107,6 +107,12 @@ var schema = mongoose.Schema({
         require:true
     }],
 
+    servicos:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Servicos',
+        require:true
+    }],
+
 });
 
 mongoose.model('Estabelecimento', schema);
