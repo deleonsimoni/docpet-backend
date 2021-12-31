@@ -7,6 +7,9 @@ module.exports = function (app) {
    var api = {};
    var model = mongoose.model('Usuario');
    var veterinarioService = require('./veterinario.js');
+   var adestradorService = require('./adestrador.js');
+   var esteticaService = require('./estetica.js');
+
    var estabelecimentoService = require('./estabelecimento.js');
 
 
@@ -36,6 +39,16 @@ module.exports = function (app) {
                //Clinica
                user.id = saveUser._id;
                let ok = estabelecimentoService.adiciona(user);
+
+            } else if (user.role == 3) {
+               //Adestrador
+               user.id = saveUser._id;
+               let ok = adestradorService.adiciona(user);
+
+            } else if (user.role == 4) {
+               //Estetica
+               user.id = saveUser._id;
+               let ok = esteticaService.adiciona(user);
 
             }
 
