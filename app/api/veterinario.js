@@ -221,8 +221,6 @@ api.adiciona = async function(req, res){
     
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    console.log(veterinarioForm);
-    
     if(endereco && endereco.cep){
         point = await MapsService.getLocaleByCEP(endereco);
         veterinarioForm.location = {

@@ -30,6 +30,11 @@ var schema = mongoose.Schema({
         coordinates: { type: [], default: undefined }
     },
 
+    uf:{
+        type:String,
+        require:true
+    },
+    
     dtCriacao:{
         type: Date,
         default: Date.now
