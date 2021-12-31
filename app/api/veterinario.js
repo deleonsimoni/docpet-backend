@@ -120,7 +120,7 @@ api.adiciona = async function(req, res){
         req.body = req;
     }
 
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img, uf } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -134,7 +134,8 @@ api.adiciona = async function(req, res){
         formacoes:formacoes,
         experiencias:experiencias,
         conquistas:conquistas,
-        img: img
+        img: img,
+        uf:uf 
     }
 
     if(req.id){
@@ -198,7 +199,7 @@ api.adiciona = async function(req, res){
 
  api.atualiza = async function(req, res){
     const _id = req.params.id;
-    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img } = req.body;
+    const {nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img, uf } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -213,12 +214,15 @@ api.adiciona = async function(req, res){
         formacoes:formacoes,
         experiencias:experiencias,
         conquistas:conquistas,
-        img: img
+        img: img,
+        uf: uf,
 
     }
     
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
+    
+    console.log(veterinarioForm);
+    
     if(endereco && endereco.cep){
         point = await MapsService.getLocaleByCEP(endereco);
         veterinarioForm.location = {
@@ -227,12 +231,13 @@ api.adiciona = async function(req, res){
         }
     }
     
-    const estabelecimentosForm = [];
+    let estabelecimentosForm = [];
 
     if(estabelecimentos.length && estabelecimentos[0].cnpj !== ""){
         estabelecimentosForm = estabelecimentos;
     }
 
+  
     await Promise.all(estabelecimentosForm.map(async estab =>{
         estab.veterinarios=[_id];
         if(estab._id){
