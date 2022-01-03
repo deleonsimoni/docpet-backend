@@ -63,10 +63,11 @@ api.adiciona = async function(req, res){
         req.body = req;
     }
 
-    const {nome, rg, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img } = req.body;
+    const {nome, rg, contato, uf, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img } = req.body;
 
     let esteticaForm = {
         nome: nome,
+        uf: uf,
         rg: rg,
         contato: contato,
         endereco: endereco,
@@ -141,11 +142,12 @@ api.adiciona = async function(req, res){
 
  api.atualiza = async function(req, res){
     const _id = req.params.id;
-    const {nome, rg, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img } = req.body;
+    const {nome, rg, uf, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img } = req.body;
 
     let esteticaForm = {
         nome: nome,
         rg: rg,
+        uf: uf,
         contato: contato,
         endereco: endereco,
         atendePlano: atendePlano,

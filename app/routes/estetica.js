@@ -1,7 +1,7 @@
 module.exports= function(app){
     
     var api = app.api.estetica;
-    app.route('/v1/esteticas')
+    app.route('/v1/estetica')
     .get(api.lista)
     .post(api.adiciona);
 

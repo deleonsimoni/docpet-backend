@@ -39,6 +39,11 @@ var schema = mongoose.Schema({
         require: true,
         default: false
     },
+
+    uf:{
+        type:String,
+        require:true
+    },
     
     status:{
         type:Boolean,
