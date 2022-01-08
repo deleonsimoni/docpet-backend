@@ -20,9 +20,16 @@ module.exports= function(app){
     app.route('/v1/veterinarios/especialidades/:id/municipio/:municipio')
     .get(api.byEspecialidadeMunicipio);
 
+    app.route('/v1/veterinarios/pesquisa/:especialidade/:municipio')
+    .get(api.byNoEspecialidadeMunicipio);
+
 
     app.route('/v1/veterinarios/perfil/:nomeFormated')
     .get(api.byName);
+    
+    app.route('/v1/veterinarios/perfil/:nomeFormated/:especialidadeFormated/:municipioFormated')
+    .get(api.byNomeEspecialidadeMunicipio);
+    
 
     app.route('/v1/veterinarios/:id')
     .get(api.buscaPorId)

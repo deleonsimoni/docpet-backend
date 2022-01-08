@@ -5,6 +5,7 @@ const MapsService = require('../services/service-maps');
 var api = {};
 var model = mongoose.model('Veterinario');
 var Estabelecimento = mongoose.model('Estabelecimento');
+var especialidadeModel = mongoose.model('Especialidade');
 var point = {}
 
 api.lista = function (req, res){
@@ -18,7 +19,7 @@ api.lista = function (req, res){
 }
 
 api.byName = function (req, res){
-    model.findOne({nomeFormated: req.params.nomeFormated})
+    model.findOne({nomeFormated: {'$regex' : req.params.nomeFormated, '$options' : 'i'}})
     .populate('especialidades')
     .populate('estabelecimentos')
     .populate({
@@ -74,8 +75,76 @@ api.byEspecialidadeMunicipio = async function (req, res){
         });
 }
 
+api.byNoEspecialidadeMunicipio = async function (req, res){
+   
+    let especialidade;
+
+    await especialidadeModel.findOne({nomeFormated: {'$regex' : formatarParamUrl(req.params.especialidade), '$options' : 'i'}}).then(function(espec){
+        especialidade = espec;
+
+    }, function(error){
+        console.log(error);
+        res.status(500).json(error);
+    });
+
+    console.log(especialidade);
+
+    let objMap = await MapsService.getLocaleFromDescription(req.params.municipio);
+    
+    console.log(objMap.geometry);
+    await model.find({$and: [
+
+        {especialidades:{_id:especialidade._id}},
+        {'location': 
+            {$near: {
+                $geometry: {
+                type: "Point" ,
+                coordinates: [ objMap.geometry.location.lng, objMap.geometry.location.lat]
+                },
+            $maxDistance: 2000000}
+        }
+        },
+    ]})
+
+    .populate('especialidades')
+    .populate('estabelecimentos')
+        .then(function(veterinarios){
+            res.json(veterinarios);
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+}
+
+api.byNomeEspecialidadeMunicipio = async function (req, res){
+
+    let especialidade;
+
+    await especialidadeModel.findOne({nomeFormated: {'$regex' : formatarParamUrl(req.params.especialidadeFormated), '$options' : 'i'}}).then(function(espec){
+        especialidade = espec;
+
+    }, function(error){
+        console.log(error);
+        res.status(500).json(error);
+    });
+    
+    await model.findOne({nomeFormated: {'$regex' : formatarParamUrl(req.params.nomeFormated), '$options' : 'i'}, $and: [
+
+        {"endereco.municipio": {'$regex' : formatarParamUrl(req.params.municipioFormated), '$options' : 'i'}}, 
+        {especialidades:{_id:especialidade._id}}
+    
+    ]}).populate('especialidades')
+    .populate('estabelecimentos')
+        .then(function(veterinarios){
+            res.json(veterinarios);
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+}
+
 api.buscaPorId = function(req, res){
-    model.findById(req.params.id).populate('estabelecimentos')
+    model.findById(req.params.id).populate('estabelecimentos').populate('especialidades')
         .then(function(veterinario){
             if(!veterinario) throw Error('Veterinário não localizado');
             res.json(veterinario);
@@ -314,7 +383,14 @@ api.createReview = async function(req, res){
 } */
 
 
+function formatarParamUrl(str){
+    if(str){
+      return str.trim().split('-').join(' ');
+    }else{
+      return "";
+    }
 
+}
 
 
 module.exports = api;
