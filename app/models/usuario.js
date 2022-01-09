@@ -22,6 +22,9 @@ var schema = mongoose.Schema({
       type: String,
       required: true,
     },
+    changePwd: {
+      type: String,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

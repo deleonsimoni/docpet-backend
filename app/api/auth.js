@@ -3,6 +3,10 @@ module.exports = function (app) {
    var mongoose = require('mongoose');
    require('dotenv').config();
    const bcrypt = require('bcrypt');
+   const nodemailer = require('nodemailer');
+   const hbs = require('nodemailer-express-handlebars')
+   const path = require('path')
+   const crypto = require("crypto");
 
    var api = {};
    var model = mongoose.model('Usuario');
@@ -73,16 +77,97 @@ module.exports = function (app) {
          res.status(400).json({ error: "Ocorreu erro não esperado " + err });
       }
 
-   } 
+   }
 
    api.changeAdmin = async function (req, res) {
 
       try {
-        await model.findByIdAndUpdate(req.params.id, {isAdmin: req.query.isAdmin}, {new: true});
+         await model.findByIdAndUpdate(req.params.id, { isAdmin: req.query.isAdmin }, { new: true });
          res.status(200).json(true);
 
       } catch (err) {
          console.log('Erro não esperado ao salvar usuário ' + err);
+         res.status(400).json({ error: "Ocorreu erro não esperado " + err });
+      }
+
+   }
+
+   api.updatePassword = async function (req, res) {
+      try {
+
+         let password = await bcrypt.hashSync(req.body.pass, 10);
+         await model.findOneAndUpdate({ changePwd: req.params.token }, { changePwd: null, hashedPassword: password }, { new: true });
+         res.status(200).json(true);
+
+      } catch (err) {
+         console.log('Erro ao atualizar a senha ' + err);
+         res.status(500).json({ error: "Ocorreu erro não esperado " + err });
+      }
+   }
+
+   api.changePassword = async function (req, res) {
+
+      try {
+
+         let userFind = await model.findOne({ email: req.body.email.toLowerCase() });
+
+         if (userFind) {
+
+            let token = crypto.randomBytes(32).toString("hex");
+
+            await model.findByIdAndUpdate(userFind._id, { changePwd: token }, { new: true });
+
+            const handlebarOptions = {
+               viewEngine: {
+                  partialsDir: path.resolve('./public/emails'),
+                  defaultLayout: false,
+               },
+               viewPath: path.resolve('./public/emails'),
+            };
+
+            let emailFormated = req.body.email.toLowerCase();
+            let emailFrom = process.env.EMAIL;
+
+            var from = emailFrom;
+            var to = emailFormated;
+
+            var smtpTransport = nodemailer.createTransport({
+               service: 'gmail',
+               auth: {
+                  user: emailFrom,
+                  pass: process.env.PASSWORDEMAIL
+               }
+            });
+
+            smtpTransport.use('compile', hbs(handlebarOptions))
+
+            var mailOptions = {
+               from: from,
+               to: to,
+               subject: 'Redefinição de Senha',
+               template: 'forgot-password',
+               context: {
+                  url: "http://localhost:4200/update-password/" + token
+               }
+            }
+
+            smtpTransport.sendMail(mailOptions, async function (error, response) {
+               if (error) {
+                  console.log('Erro ao enviar email: ' + error)
+                  res.status(500).json({ error: "Ocorreu erro não esperado " + error });
+               } else {
+                  console.log('Email de recuperação de senha enviado com sucesso para: ' + userFind.email)
+                  res.status(200).json(true);
+               }
+            });
+         } else {
+            console.log('Usuário não identificado para resgatar senha! ')
+            res.status(400).json({ error: "Ocorreu erro não esperado " });
+         }
+
+
+      } catch (err) {
+         console.log('Erro ao enviar email para recuperação ' + err);
          res.status(400).json({ error: "Ocorreu erro não esperado " + err });
       }
 
