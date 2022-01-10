@@ -39,7 +39,6 @@ async function getLocaleFromPlaceID(placeID) {
     }
 
 }
-
 async function getLocaleFromDescription(description) {
 
     try {
