@@ -3,6 +3,10 @@ require('dotenv').config();
 
 const key = process.env.TOKEN_GMAPS;
 
+if(!key){
+    throw "NÃO FOI POSSÍVEL LOCALIZAR A CHAVE DO GOOGLE MAPS";
+}
+
 async function getLocaleByCEP(address) {
 
     let addressMaps = address.logradouro + ', ' + address.numero + ' - ' + address.bairro + ', ' + address.municipio + ' - ' + address.estado + ', ' + address.cep;
@@ -28,8 +32,6 @@ async function getLocaleFromPlaceID(placeID) {
         const data = await axios.get(
             `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeID}&key=${key}&language=pt_BR`
         )
-        
-        console.log(data.data.result.geometry.location);
 
         return data.data.result.geometry.location;
     }
@@ -42,7 +44,7 @@ async function getLocaleFromPlaceID(placeID) {
 async function getLocaleFromDescription(description) {
 
     try {
-          
+         console.log(description); 
         const data = await axios.get(
             `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${description}&key=${key}`
         )
@@ -87,7 +89,7 @@ async function getLocale(search) {
                     response.push({description: i.description, placeId: i.place_id, main_text: i.structured_formatting.main_text})
                   }
             }
-            console.log(response);
+            
           return response;
 
     }

@@ -87,11 +87,8 @@ api.byNoEspecialidadeMunicipio = async function (req, res){
         res.status(500).json(error);
     });
 
-    console.log(especialidade);
-
     let objMap = await MapsService.getLocaleFromDescription(req.params.municipio);
     
-    console.log(objMap.geometry);
     await model.find({$and: [
 
         {especialidades:{_id:especialidade._id}},
