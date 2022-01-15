@@ -9,13 +9,14 @@ module.exports= function(app){
 
     app.route('/v1/especialidades/:id')
     .put(api.atualizaEspecialidade)
-    .delete(api.removeEspecialidadePorId);
+    .delete(api.removeEspecialidadePorId)
+    .get(api.buscaPorId);
 
     
-    app.route('/v1/especialidades/total')
+    app.route('/v1/especialidades-total')
     .get(api.listaTotalEspcEstab);
     
-    app.route('/v1/especialidades/search')
+    app.route('/v1/especialidades-search')
     .get(api.listAll);
    // .post(api.adiciona);
 

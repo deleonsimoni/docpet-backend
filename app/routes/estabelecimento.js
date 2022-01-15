@@ -14,6 +14,9 @@ module.exports= function(app){
     .get(api.buscaPorId)
     .put(api.atualiza);
 
+    app.route('/v1/estabelecimentos/nome/:nome')
+    .get(api.byNome);
+
     app.route('/v1/estabelecimentos/cep/:cep')
     .get(api.cepToLocale);
     /*.delete(api.removePorId)

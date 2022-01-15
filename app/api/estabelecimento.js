@@ -4,10 +4,11 @@ const MapsService = require('../services/service-maps');
 var api = {};
 var model = mongoose.model('Estabelecimento');
 var Veterinario = mongoose.model('Veterinario');
+var servico = mongoose.model('Servico');
 var point = {}
 
 api.lista = function (req, res){
-    model.find({}).populate('veterinarios').populate('especialidades')
+    model.find({}).populate('veterinarios').populate('especialidades').populate('servicos')
         .then(function(estabelecimentos){
             res.json(estabelecimentos);
         }, function(error){
@@ -20,7 +21,7 @@ api.adiciona = async function(req, res){
     if(!req.body){
         req.body = req;
     }
-    const {nome, cnpj, contato, endereco, atendePlano, especialidades, veterinarios } = req.body;
+    const {nome, cnpj, contato, endereco, atendePlano, especialidades, veterinarios, img, servicos } = req.body;
 
     let estabelecimentoForm = {
         nome: nome,
@@ -28,7 +29,9 @@ api.adiciona = async function(req, res){
         contato: contato,
         endereco: endereco,
         atendePlano: atendePlano,
-        especialidades: especialidades
+        especialidades: especialidades,
+        servicos: servicos,
+        img: img,
     }
 
     if(req.id){
@@ -122,7 +125,7 @@ api.cepToLocale = async function(req, res){
 api.atualiza = async function(req, res){
     const _id = req.params.id;
 
-    const {nome, cnpj, contato, endereco, atendePlano, especialidades, status, veterinarios } = req.body;
+    const {nome, cnpj, contato, endereco, atendePlano, especialidades, status, veterinarios, img, servicos } = req.body;
 
     let estabelecimento = {
         nome: nome,
@@ -132,7 +135,9 @@ api.atualiza = async function(req, res){
         atendePlano: atendePlano,
         especialidades: especialidades,
         status: status,
-        veterinarios: []
+        veterinarios: [],
+        img: img,
+        servicos: servicos,
     }
 
     estabelecimento.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -180,6 +185,30 @@ api.atualiza = async function(req, res){
         res.status(500).json(error);
     });
    
+}
+
+api.byNome = async function (req, res){
+    let name = formatarParamUrl(req.params.nome);
+
+    const strFormated = new RegExp(`${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+
+    await model.findOne({nomeFormated: strFormated}).populate('veterinarios').populate('especialidades').populate('servicos')
+        .then(function(estabelecimento){
+            res.json(estabelecimento);
+        }, function(error){
+            console.log(error);
+            res.status(500).json(error);
+        });
+    
+}
+
+function formatarParamUrl(str){
+    if(str){
+      return str.trim().split('-').join(' ');
+    }else{
+      return "";
+    }
+
 }
 
 /*api.removePorId = function(req, res){

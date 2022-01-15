@@ -9,6 +9,9 @@ var schema = mongoose.Schema({
     nomeFormated:{
         type:String, 
     },
+    img:{
+        type:String, 
+    },
     cnpj:{
         type:String,
         require: true
@@ -109,7 +112,7 @@ var schema = mongoose.Schema({
 
     servicos:[{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Servicos',
+        ref: 'Servico',
         require:true
     }],
 

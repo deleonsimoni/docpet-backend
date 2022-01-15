@@ -130,7 +130,8 @@ api.byNomeEspecialidadeMunicipio = async function (req, res){
         {"endereco.municipio": {'$regex' : formatarParamUrl(req.params.municipioFormated), '$options' : 'i'}}, 
         {especialidades:{_id:especialidade._id}}
     
-    ]}).populate('especialidades')
+    ]})
+    .populate('especialidades')
     .populate('estabelecimentos')
         .then(function(veterinarios){
             res.json(veterinarios);
@@ -218,7 +219,7 @@ api.adiciona = async function(req, res){
 
     veterinarioForm.nomeFormated = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const estabelecimentosForm = [];
+    let estabelecimentosForm = [];
 
     if(estabelecimentos.length && estabelecimentos[0].cnpj !== ""){
         estabelecimentosForm = estabelecimentos;

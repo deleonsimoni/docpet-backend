@@ -32,7 +32,8 @@ api.listaTotalEspcEstab = async function (req, res) {
                 });
             }));
             //ret = [{...especialidades, totalVet}];
-            res.json(ret);
+            
+            res.json(ret.sort((a,b) => (a.totalVet < b.totalVet) ? 1 : ((b.totalVet < a.totalVet) ? -1 : 0)));
         }, function (error) {
             console.log(error);
             res.status(500).json(error);
@@ -104,6 +105,8 @@ api.removeEspecialidadePorId = async function (req, res) {
 
 api.adicionaEspecialidade = function (req, res) {
 
+    req.body.nomeFormated = req.body.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     especialidadeModel.create(req.body)
         .then(function (estabelecimento) {
             res.json(estabelecimento);
@@ -124,50 +127,16 @@ api.atualizaEspecialidade = function (req, res) {
         })
 }
 
+api.buscaPorId = function(req, res){
 
-/* api.adiciona = function(req, res){
-    model.create(req.body)
-     .then(function(estabelecimento){
-         res.json(estabelecimento);
-     }, function(error){
-         console.log(error);
-         res.status(500).json(error);
-     })
- }
-*/
-/*api.buscaPorId = function(req, res){
-    model.findById(req.params.id)
-        .then(function(foto){
-            if(!foto) throw Error('Foto não encontrada');
-            res.json(foto);
+    especialidadeModel.findById(req.params.id)
+        .then(function(especialidade){
+            if(!especialidade) throw Error('Especialidade não encontrado');
+            res.json(especialidade);
         }, function(error){
             console.log(error);
             res.status(404).json(error);
         })
 }
-api.removePorId = function(req, res){
-    model.deleteOne({_id: req.params.id})
-        .then(function(){
-            res.sendStatus(204);
-
-        }, function(error){
-            console.log(error);
-            res.status(500).json(error);
-        })
-}
-
-
-
-api.atualiza = function(req, res){
-    model.findByIdAndUpdate(req.params.id, req.body)
-        .then(function(foto){
-            res.json(foto);
-
-        }, function(error){
-            console.log(error);
-            res.status(500).json(error);
-        })
-}
-*/
 
 module.exports = api;
