@@ -23,4 +23,8 @@ module.exports = function(app) {
 
     app.route('/v1/adestrador/perfil/:nome/municipio/:municipio')
         .get(api.byNomeMunicipio);
+
+    app.route('/v1/adestrador/review/:id')
+        .get(api.getReview)
+        .post(api.createReview);
 }

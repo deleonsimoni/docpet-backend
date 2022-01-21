@@ -231,6 +231,38 @@ api.atualiza = async function(req, res) {
     });
 }
 
+
+api.getReview = async function(req, res) {
+    try {
+        let review = await model.findById(req.params.id).populate({
+            path: 'reviews',
+            populate: {
+                path: 'user',
+                model: 'Usuario',
+                select: 'nome'
+            }
+        }).select('reviews');
+        res.status(200).json({ reviews: review });
+
+    } catch (err) {
+        console.log('Erro não esperado ao salvar usuário ' + err);
+        res.status(400).json({ error: "Ocorreu erro não esperado " + err });
+    }
+};
+
+api.createReview = async function(req, res) {
+
+    try {
+
+        let a = await model.findOneAndUpdate({ _id: req.params.id }, { $push: { reviews: req.body } });
+        res.status(200).json(true);
+
+    } catch (err) {
+        console.log('Erro não esperado ao salvar review ' + err);
+        res.status(400).json({ error: "Ocorreu erro não esperado " + err });
+    }
+};
+
 function formatarParamUrl(str) {
     if (str) {
         return str.trim().split('-').join(' ');
