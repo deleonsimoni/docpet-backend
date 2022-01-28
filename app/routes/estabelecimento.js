@@ -20,7 +20,7 @@ module.exports = function(app) {
     app.route('/v1/estabelecimentos/cep/:cep')
         .get(api.cepToLocale);
 
-    app.route('/v1/veterinarios/review/:id')
+    app.route('/v1/estabelecimentos/review/:id')
         .get(api.getReview)
         .post(api.createReview);
 
