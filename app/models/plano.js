@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+var BrazilianCurrency = require('@logicamente.info/mongoose-currency-brl');
+BrazilianCurrency.loadType(mongoose);
+
 var schema = mongoose.Schema({
     nome: {
         type: String,
@@ -16,15 +19,18 @@ var schema = mongoose.Schema({
     },
 
     cobranca: {
-        /*valor: {
+        valor: {
             type: BrazilianCurrency
-        },*/
+        },
         parcela: {
             type: Boolean,
             default: false
         },
         quantidadeParcela: {
             type: Number
+        },
+        cupom: {
+            type: String,
         }
     },
 
@@ -36,7 +42,19 @@ var schema = mongoose.Schema({
         descricao: {
             type: String
         }
-    }]
+    }],
+
+    diasVencimento: {
+        type: Number,
+        require: true
+    },
+
+    status: {
+        type: Boolean,
+        require: true,
+        default: true
+    },
+
 });
 
 mongoose.model('Plano', schema);
