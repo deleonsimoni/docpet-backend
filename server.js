@@ -2,7 +2,7 @@ var http = require('http');
 var app = require('./config/express');
 require('dotenv').config();
 var porta = 3001
-    /*require('./config/database')('localhost/pet'); */
+    //require('./config/database')('localhost/vetzdes');
 require('./config/database')('mongo71-farm10.kinghost.net/vetzco01', {
     user: 'vetzco01',
     pass: 'Ad=15937-Bcng',
