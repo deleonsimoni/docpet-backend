@@ -18,6 +18,26 @@ api.lista = function(req, res) {
         });
 }
 
+api.listaTodosReview = function(req, res) {
+        model.find({
+                'reviews': {
+                    '$exists': true,
+                    '$not': {
+                        '$size': 0
+                    }
+                }
+            }).sort({
+                'reviews.score': -1
+            }).populate('especialidades').populate('estabelecimentos')
+            .then(function(veterinarios) {
+                console.log(veterinarios.length)
+                res.json(veterinarios);
+            }, function(error) {
+                console.log(error);
+                res.status(500).json(error);
+            });
+    }
+    //{reviews : { $exists: true, $not: {$size: 0} }}
 api.byName = function(req, res) {
     model.findOne({ nomeFormated: { '$regex': req.params.nomeFormated, '$options': 'i' } })
         .populate('especialidades')
