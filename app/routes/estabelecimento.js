@@ -24,6 +24,9 @@ module.exports = function(app) {
         .get(api.getReview)
         .post(api.createReview);
 
+    app.route('/v1/estabelecimentos/usuario/:id')
+        .get(api.buscaPorUsuario);
+
     /*.delete(api.removePorId)
     .put(api.atualiza); */
 }
