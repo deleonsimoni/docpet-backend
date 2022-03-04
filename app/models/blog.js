@@ -13,9 +13,10 @@ var schema = mongoose.Schema({
     link_author:{
         type:String, 
     },
-    speciality:{
-        type:String, 
-        
+    especialidade:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Especialidade',
+        require:true
     },
     doctor_name:{
         type:String, 

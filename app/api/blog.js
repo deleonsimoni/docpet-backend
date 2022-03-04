@@ -5,7 +5,7 @@ var model = mongoose.model('Blog');
 var point = {}
 
 api.lista = function(req, res) {
-    model.find({})
+    model.find({}).populate('especialidade')
         .then(function(blogs) {
             res.json(blogs);
         }, function(error) {
@@ -16,7 +16,7 @@ api.lista = function(req, res) {
 
 
 api.byTitle = function(req, res) {
-    model.find({ link_blog: req.params.link_blog})
+    model.find({ link_blog: req.params.linkblog})
         .then(function(blog) {
             res.json(blog);
         }, function(error) {
@@ -53,13 +53,13 @@ api.adiciona = async function(req, res) {
         req.body = req;
     }
 
-    const { title, link_blog, link_author, speciality, doctor_name, doctor_pic, short_description, description, img, reviews, createdAt } = req.body;
+    const { title, link_blog, link_author, especialidade, doctor_name, doctor_pic, short_description, description, img, reviews, createdAt } = req.body;
 
     let blogForm = {
         title: title,
         link_blog: formatarTitleUrl(link_blog),
         link_author: formatarTitleUrl(link_author),
-        speciality: speciality,
+        especialidade: especialidade,
         doctor_name: doctor_name,
         doctor_pic: doctor_pic,
         short_description: short_description,
