@@ -35,6 +35,9 @@ var schema = mongoose.Schema({
     img:{
         type:String, 
     },
+    local:{
+        type:String, 
+    },
     reviews:[{
         createdAt: {
             type: Date,
