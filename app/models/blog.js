@@ -35,7 +35,7 @@ var schema = mongoose.Schema({
     img:{
         type:String, 
     },
-    local:{
+    place:{
         type:String, 
     },
     reviews:[{
