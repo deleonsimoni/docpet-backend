@@ -53,7 +53,7 @@ api.adiciona = async function(req, res) {
         req.body = req;
     }
 
-    const { title, link_blog, link_author, especialidade, doctor_name, doctor_pic, short_description, description, img, reviews, createdAt } = req.body;
+    const { title, link_blog, link_author, especialidade, doctor_name, doctor_pic, short_description, description, img, place, reviews, createdAt } = req.body;
 
     let blogForm = {
         title: title,
@@ -65,6 +65,7 @@ api.adiciona = async function(req, res) {
         short_description: short_description,
         description: description,
         img: img,
+        place: place,
         reviews: reviews,
         createdAt: createdAt
         
@@ -92,7 +93,7 @@ api.adiciona = async function(req, res) {
 
 api.atualiza = async function(req, res) {
     const _id = req.params.id;
-    const { title, link_blog, link_author, especialidades, doctor_name, doctor_pic, short_description, description, img, reviews, createdAt } = req.body;
+    const { title, link_blog, link_author, especialidades, doctor_name, doctor_pic, short_description, description, img, place, reviews, createdAt } = req.body;
 
     let blogForm = {
         title: title,
@@ -104,6 +105,7 @@ api.atualiza = async function(req, res) {
         short_description: short_description,
         description: description,
         img: img,
+        place: place,
         reviews: reviews,
         createdAt: createdAt
 
