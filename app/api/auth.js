@@ -8,6 +8,9 @@ module.exports = function (app) {
    const path = require('path')
    const crypto = require("crypto");
 
+   const accessService = require("../services/access");
+   var accessDB = mongoose.model('Access');
+
    var api = {};
    var model = mongoose.model('Usuario');
    var veterinarioService = require('./veterinario.js');
@@ -70,7 +73,46 @@ module.exports = function (app) {
    api.getUsers = async function (req, res) {
 
       try {
-         let users = await model.find({}).select('-hashedPassword ');
+         // let users = await model.find({}).select('-hashedPassword ');
+         let users = await
+            model.aggregate([
+               {
+                  '$lookup': {
+                     'from': 'accesses',
+                     'localField': '_id',
+                     'foreignField': 'user',
+                     'as': 'accesses'
+                  }
+               },
+               { $unwind: { path: "$accesses", preserveNullAndEmptyArrays: true } },
+               { $sort: { "accesses.dateAccess": -1 } },
+               {
+                  $group: {
+                     "_id": "$_id",
+                     "nome": { $first: "$nome" },
+                     "img": { $first: "$img" },
+                     "email": { $first: "$email" },
+                     "role": { $first: "$role" },
+                     "createdAt": { $first: "$createdAt" },
+                     "isAdmin": { $first: "$isAdmin" },
+                     "lastLogin": { $first: "$accesses.dateAccess" }
+                  }
+               },
+               {
+                  $project: {
+                     "_id": 1,
+                     "nome": 1,
+                     "img": 1,
+                     "email": 1,
+                     "role": 1,
+                     "createdAt": 1,
+                     "isAdmin": 1,
+                     "lastLogin": 1
+                  }
+               },
+
+            ]).exec()
+
          res.status(200).json({ users: users });
       } catch (err) {
          console.log('Erro não esperado ao salvar usuário ' + err);
@@ -189,6 +231,9 @@ module.exports = function (app) {
                   console.log('Login e senha inválidos 2');
                   res.sendStatus(401);
                } else {
+
+                  accessService.markAccessProfile(usuario.role, usuario._id);
+
                   var token = jwt.sign({ id: usuario._id, login: usuario.nome, role: usuario.role, isAdmin: usuario.isAdmin }, process.env.SECRET, {
                      expiresIn: 84600
                   });
