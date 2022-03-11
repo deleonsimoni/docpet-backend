@@ -1,7 +1,6 @@
 var express = require('express');
 var consign = require('consign');
 var cors = require("cors");
-const passport = require('./passport')
 
 // configurações do express
 var app = express();
@@ -15,7 +14,6 @@ const corsOptions = {
     optionSuccessStatus: 200,
 }
 
-app.use(passport.initialize());
 
 
 app.use(cors());

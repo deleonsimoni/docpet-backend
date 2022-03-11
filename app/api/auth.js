@@ -72,6 +72,11 @@ module.exports = function (app) {
 
    api.getUsers = async function (req, res) {
 
+      if (!req.user.isAdmin) {
+         res.status(401).json({ error: "Não autorizado" });
+         return
+      }
+
       try {
          // let users = await model.find({}).select('-hashedPassword ');
          let users = await
@@ -122,6 +127,11 @@ module.exports = function (app) {
    }
 
    api.changeAdmin = async function (req, res) {
+
+      if (!req.user.isAdmin) {
+         res.status(401).json({ error: "Não autorizado" });
+         return
+      }
 
       try {
          await model.findByIdAndUpdate(req.params.id, { isAdmin: req.query.isAdmin }, { new: true });
