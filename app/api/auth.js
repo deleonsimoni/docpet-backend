@@ -231,6 +231,9 @@ module.exports = function (app) {
                   console.log('Login e senha inválidos 2');
                   res.sendStatus(401);
                } else {
+
+                  accessService.markAccessProfile(usuario.role, usuario._id);
+
                   var token = jwt.sign({ id: usuario._id, login: usuario.nome, role: usuario.role, isAdmin: usuario.isAdmin }, process.env.SECRET, {
                      expiresIn: 84600
                   });
