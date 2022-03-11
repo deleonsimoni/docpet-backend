@@ -36,12 +36,13 @@ api.adiciona = async function(req, res) {
     }
 
     if (req.id) {
-        veterinarioForm.user = req.body.id;
+        estabelecimentoForm.user = req.body.id;
     }
 
     if (endereco && endereco.cep) {
         point = await MapsService.getLocaleByCEP(endereco);
         estabelecimentoForm.location = {
+            type: 'Point',
             coordinates: [point.lng, point.lat]
         }
     }
@@ -89,7 +90,7 @@ api.adiciona = async function(req, res) {
 }
 
 api.buscaPorId = function(req, res) {
-    model.findById(req.params.id).populate('veterinarios').populate('estabelecimento')
+    model.findById(req.params.id).populate('veterinarios').populate('especialidades').populate('servicos')
         .then(function(estabelecimento) {
             if (!estabelecimento) throw Error('Estabelecimento não encontrada');
             res.json(estabelecimento);
@@ -245,29 +246,39 @@ function formatarParamUrl(str) {
 
 }
 
-/*api.removePorId = function(req, res){
-    model.deleteOne({_id: req.params.id})
-        .then(function(){
-            res.sendStatus(204);
+api.buscaPorUsuario = function(req, res) {
+        model.findOne({ user: req.params.id }).populate('veterinarios').populate('especialidades').populate('servicos')
+            .then(function(estabelecimento) {
+                if (!estabelecimento) throw Error('Esatabelecimento não localizado');
+                res.json(estabelecimento);
+            }, function(error) {
+                console.log(error);
+                res.status(404).json(error);
+            })
+    }
+    /*api.removePorId = function(req, res){
+        model.deleteOne({_id: req.params.id})
+            .then(function(){
+                res.sendStatus(204);
 
-        }, function(error){
-            console.log(error);
-            res.status(500).json(error);
-        })
-}
+            }, function(error){
+                console.log(error);
+                res.status(500).json(error);
+            })
+    }
 
 
 
-api.atualiza = function(req, res){
-    model.findByIdAndUpdate(req.params.id, req.body)
-        .then(function(foto){
-            res.json(foto);
+    api.atualiza = function(req, res){
+        model.findByIdAndUpdate(req.params.id, req.body)
+            .then(function(foto){
+                res.json(foto);
 
-        }, function(error){
-            console.log(error);
-            res.status(500).json(error);
-        })
-}
-*/
+            }, function(error){
+                console.log(error);
+                res.status(500).json(error);
+            })
+    }
+    */
 
 module.exports = api;

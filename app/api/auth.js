@@ -189,7 +189,7 @@ module.exports = function (app) {
                subject: 'Redefinição de Senha',
                template: 'forgot-password',
                context: {
-                  url: "http://localhost:4200/update-password/" + token
+                  url: "http://vetzco.com.br/update-password/" + token
                }
             }
 
@@ -231,9 +231,6 @@ module.exports = function (app) {
                   console.log('Login e senha inválidos 2');
                   res.sendStatus(401);
                } else {
-
-                  accessService.markAccessProfile(usuario.role, usuario._id);
-
                   var token = jwt.sign({ id: usuario._id, login: usuario.nome, role: usuario.role, isAdmin: usuario.isAdmin }, process.env.SECRET, {
                      expiresIn: 84600
                   });

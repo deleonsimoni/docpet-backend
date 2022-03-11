@@ -11,6 +11,6 @@ require('./config/database')('localhost/vetzdes');
         useUnifiedTopology: true
     });*/
 
-http.createServer(app).listen(porta, function () {
+http.createServer(app).listen(3001, function () {
     console.log('Server Start - V.1.11 - Porta - ' + porta);
 });

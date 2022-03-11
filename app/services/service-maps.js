@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const key = process.env.TOKEN_GMAPS;
 
-if(!key){
+if (!key) {
     throw "NÃO FOI POSSÍVEL LOCALIZAR A CHAVE DO GOOGLE MAPS";
 }
 
@@ -17,8 +17,7 @@ async function getLocaleByCEP(address) {
             `https://maps.googleapis.com/maps/api/geocode/json?address=${addressMaps}&key=${key}`
         )
         return data.data.results[0].geometry.location;
-    }
-    catch (err) {
+    } catch (err) {
         console.log('ERRO AO BUSCAR LOCALE POR CEP -> ' + err);
         return null;
     }
@@ -28,14 +27,13 @@ async function getLocaleByCEP(address) {
 async function getLocaleFromPlaceID(placeID) {
 
     try {
-        
+
         const data = await axios.get(
             `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeID}&key=${key}&language=pt_BR`
         )
 
         return data.data.result.geometry.location;
-    }
-    catch (err) {
+    } catch (err) {
         console.log('ERRO AO BUSCAR LOCALE POR PLACEID -> ' + err);
         return null;
     }
@@ -44,17 +42,16 @@ async function getLocaleFromPlaceID(placeID) {
 async function getLocaleFromDescription(description) {
 
     try {
-         console.log(description); 
+        console.log(description);
         const data = await axios.get(
             `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${description}&key=${key}`
         )
-        if(!data.data){
+        if (!data.data) {
             throw "NÃO POSSÍVEL ENCOTRAR LOCALIZAÇÃO PELO ENDEREÇO INFORMADO";
-        } 
-        
+        }
+
         return data.data.results[0];
-    }
-    catch (err) {
+    } catch (err) {
         console.log('ERRO AO BUSCAR LOCALE POR DESCRIÇÃO -> ' + err);
         return null;
     }
@@ -84,16 +81,15 @@ async function getLocale(search) {
                 },
             })
 
-            if(data.data && data.data.predictions){
-                for (var i of data.data.predictions) {
-                    response.push({description: i.description, placeId: i.place_id, main_text: i.structured_formatting.main_text})
-                  }
+        if (data.data && data.data.predictions) {
+            for (var i of data.data.predictions) {
+                response.push({ description: i.description, placeId: i.place_id, main_text: i.structured_formatting.main_text })
             }
-            
-          return response;
+        }
 
-    }
-    catch (err) {
+        return response;
+
+    } catch (err) {
         console.log('ERRO AO BUSCAR LOCALE -> ' + err);
         return null;
     }
