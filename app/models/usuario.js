@@ -42,4 +42,4 @@ var schema = mongoose.Schema({
     versionKey: false,
 });
 
-mongoose.model('Usuario', schema);
+mongoose.models.Usuario || mongoose.model('Usuario', schema);
