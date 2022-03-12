@@ -1,42 +1,43 @@
 {
-  "name": "vetzco-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/"
-  },
-  "homepage": "https://github.com/",
-  "dependencies": {
-    "@googlemaps/google-maps-services-js": "^3.3.7",
-    "@logicamente.info/mongoose-currency-brl": "^1.0.1",
-    "axios": "^0.24.0",
-    "bcrypt": "^5.0.1",
-    "body-parser": "^1.19.1",
-    "consign": "^0.1.6",
-    "cors": "^2.8.5",
-    "dotenv": "^10.0.0",
-    "dotenv-safe": "^8.2.0",
-    "express": "^4.17.2",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.13.14",
-    "multer": "^1.4.4",
-    "nodemailer": "^6.7.2",
-    "nodemailer-express-handlebars": "^4.0.0",
-    "nodemon": "^2.0.15",
-    "passport": "^0.5.2",
-    "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0",
-    "xoauth2": "^1.2.0"
-  }
+    "name": "vetzco-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "dev": "nodemon server.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/"
+    },
+    "homepage": "https://github.com/",
+    "dependencies": {
+        "@googlemaps/google-maps-services-js": "^3.3.7",
+        "@logicamente.info/mongoose-currency-brl": "^1.0.1",
+        "axios": "^0.24.0",
+        "bcrypt": "^5.0.1",
+        "body-parser": "^1.19.1",
+        "consign": "^0.1.6",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0",
+        "dotenv-safe": "^8.2.0",
+        "express": "^4.17.2",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.13.14",
+        "multer": "^1.4.4",
+        "nodemailer": "^6.7.2",
+        "nodemailer-express-handlebars": "^4.0.0",
+        "nodemon": "^2.0.15",
+        "passport": "^0.5.2",
+        "passport-jwt": "^4.0.0",
+        "passport-local": "^1.0.0",
+        "xoauth2": "^1.2.0"
+    }
 }
