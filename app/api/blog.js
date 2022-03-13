@@ -2,6 +2,8 @@ mongoose = require('mongoose');
 
 var api = {};
 var model = mongoose.model('Blog');
+var especialidadeModel = mongoose.model('Especialidade');
+var cod = "";
 var point = {}
 
 api.lista = function(req, res) {
@@ -13,8 +15,48 @@ api.lista = function(req, res) {
             res.status(500).json(error);
         });
 }
+api.listaTotalEspcBlog = async function(req, res) {
+    let ret = [];
 
+    await especialidadeModel.find({}).sort({ nome: 'asc' })
+        .then(async function(especialidades) {
+            let totalEstab = 0;
+            await Promise.all(especialidades.map(async especialidade => {
+                await model.find({ especialidade: especialidade._id }).count().then(async function(count) {
+                    
+                    if (count > 0){
+                    ret.push({...especialidade._doc, 'num_blog': count });
+                    }
+                });
+            }));
+            
 
+           res.json(ret);
+        }, function(error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
+
+}
+api.listaEspcBlog = async function(req, res) {
+    let ret = [];
+    let parm = formatarParamUrl(req.params.nomeFormated);
+    const strFormated = new RegExp(`${parm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+    await especialidadeModel.find({'nomeFormated':strFormated}).sort({ createdAt: 'desc' })
+    .then(function(especialidades) {
+        //res.json(especialidades);
+        let cod = especialidades._id;
+        model.find({ especialidade: cod })
+        .populate('especialidade')
+        .then(function(blogs) {
+            res.json(blogs);
+        });    
+    }, function(error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
+
+}
 api.byTitle = function(req, res) {
     model.find({ link_blog: req.params.linkblog})
         .then(function(blog) {
@@ -25,13 +67,40 @@ api.byTitle = function(req, res) {
         });
 }
 api.byEspecialidade = function(req, res) {
-    model.find({ 'speciality': req.params.speciality })
+    model.find({ 'especialidade': req.params.especialidade })
         .then(function(blog) {
             res.json(blog);
         }, function(error) {
             console.log(error);
             res.status(500).json(error);
         });
+}
+api.byEspecialidadeName = function(req, res) {
+    let ret = [];
+    let parm = formatarParamUrl(req.params.nomeFormated);
+    const strFormated = new RegExp(`${parm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+    especialidadeModel.find({'nomeFormated':strFormated})
+    .then(function(especialidades) {
+        cod = especialidades._id;
+        Promise.all(especialidades.map(async especialidade => {
+            await model.find({ especialidade: especialidade._id }).then(async function(blogs) {
+                res.json(blogs);
+            });
+        }));
+        
+        
+
+    });
+    
+  /*  model.find({ especialidade: cod })
+    .populate('especialidades')    
+    .then(function(blog) {
+            res.json(blog);
+        }, function(error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
+    */
 }
 
 api.buscaPorId = function(req, res) {

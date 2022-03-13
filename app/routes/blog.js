@@ -9,6 +9,9 @@ module.exports = function(app) {
     app.route('/v1/blogs/especialidade/:especialidade')
         .get(api.byEspecialidade);
 
+    app.route('/v1/blogs/nome/:nomeFormated')
+        .get(api.byEspecialidadeName);
+
     app.route('/v1/blogs/link/:linkblog')
         .get(api.byTitle);
 
@@ -16,7 +19,8 @@ module.exports = function(app) {
         .get(api.buscaPorId)
         .put(api.atualiza);
 
-    
+    app.route('/v1/especialidades-blog-total')
+        .get(api.listaTotalEspcBlog);
     /*.delete(api.removePorId)
     .put(api.atualiza);*/
 }
