@@ -11,6 +11,9 @@ module.exports = function(app) {
         .delete(api.removePlanoId)
         .get(api.buscaPorId);
 
+    app.route('/v1/planos/nome/:nomeFormated')
+        .get(api.buscaPorNome);
+
 
 
 
