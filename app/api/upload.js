@@ -1,8 +1,11 @@
+require('dotenv').config();
 mongoose = require('mongoose');
 var modelUpload = mongoose.model('Upload');
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util')
+const { promisify } = require('util');
+const aws = require('aws-sdk');
+const s3 = new aws.S3();
 
 
 var api = {};
@@ -19,7 +22,7 @@ api.lista = async function(req, res) {
 }
 
 api.adiciona = async function(req, res) {
-    const arquivo = { originalname: name, size, key, url = '' } = req.file;
+    const arquivo = { originalname: name, size, key, location: url = '' } = req.file;
     console.log(req.file);
 
     post = await modelUpload.create({
@@ -51,6 +54,12 @@ api.remove = async function(req, res) {
                         if (err) throw err;
                         console.log(pathDir);
                     })
+                } else if (process.env.STORAGE_TYPE === 's3') {
+                    ///return s3.deleteObject({
+                    //   bucket: 'vetzco-img',
+                    //   key: arquivo.key,
+
+                    // }).promise();
                 }
                 res.sendStatus(204);
 
