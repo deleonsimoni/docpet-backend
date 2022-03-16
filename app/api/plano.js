@@ -72,6 +72,27 @@ api.buscaPorId = function(req, res) {
             res.status(404).json(error);
         })
 }
+api.buscaPorNome = function(req, res) {
+    console.log(req.params.nomeFormated)
+    let parm = formatarParamUrl(req.params.nomeFormated);
+    const strFormated = new RegExp(`${parm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+    modal.find({'nomeFormated':strFormated})
+        .then(function(plano) {
+            if (!plano) throw Error('Plano não encontrado');
+            res.json(plano);
+        }, function(error) {
+            console.log(error);
+            res.status(404).json(error);
+        })
+}
 
+function formatarParamUrl(str) {
+    if (str) {
+        return str.trim().split('-').join(' ');
+    } else {
+        return "";
+    }
+
+}
 
 module.exports = api;
