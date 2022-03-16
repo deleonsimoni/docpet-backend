@@ -1,6 +1,6 @@
 const passport = require("passport");
 
-module.exports = function (app) {
+module.exports = function(app) {
 
     var api = app.api.dashboard;
 

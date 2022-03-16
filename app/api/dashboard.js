@@ -9,8 +9,9 @@ var parametersModel = mongoose.model('Parameters');
 
 var accessModel = mongoose.model('Access');
 
-api.dasboardAdmin = async function (req, res) {
-
+api.dasboardAdmin = async function(req, res) {
+    console.log('aaaaaaaaaa')
+    console.log(req.user);
     if (!req.user.isAdmin) {
         res.status(401).json({ error: "Não autorizado" });
         return
@@ -34,7 +35,7 @@ api.dasboardAdmin = async function (req, res) {
     }
 }
 
-api.markAccess = async function (req, res) {
+api.markAccess = async function(req, res) {
 
     try {
         let accessdb = await parametersModel.findOneAndUpdate({ access: { $ne: null } }, { $inc: { 'access': 1 } });
