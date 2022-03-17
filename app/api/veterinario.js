@@ -113,32 +113,38 @@ api.byNoEspecialidadeMunicipio = async function(req, res) {
 
     let objMap = await MapsService.getLocaleFromDescription(req.params.municipio);
 
-    await model.find({
-        $and: [
+    console.log(objMap);
+    if (objMap) {
+        await model.find({
+            $and: [
 
-            { especialidades: { _id: especialidade._id } },
-            {
-                'location': {
-                    $near: {
-                        $geometry: {
-                            type: "Point",
-                            coordinates: [objMap.geometry.location.lng, objMap.geometry.location.lat]
-                        },
-                        $maxDistance: 2000000
+                { especialidades: { _id: especialidade._id } },
+                {
+                    'location': {
+                        $near: {
+                            $geometry: {
+                                type: "Point",
+                                coordinates: [objMap.geometry.location.lng, objMap.geometry.location.lat]
+                            },
+                            $maxDistance: 2000000
+                        }
                     }
-                }
-            },
-        ]
-    })
+                },
+            ]
+        })
 
-    .populate('especialidades')
-        .populate('estabelecimentos')
-        .then(function(veterinarios) {
-            res.json(veterinarios);
-        }, function(error) {
-            console.log(error);
-            res.status(500).json(error);
-        });
+        .populate('especialidades')
+            .populate('estabelecimentos')
+            .then(function(veterinarios) {
+                res.json(veterinarios);
+            }, function(error) {
+                console.log(error);
+                res.status(500).json(error);
+            });
+    } else {
+        console.log('Não foi possível localizar vets');
+        res.status(500).json('Não foi possível localizar vets');
+    }
 }
 
 api.byNomeEspecialidadeMunicipio = async function(req, res) {

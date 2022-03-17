@@ -10,8 +10,7 @@ var parametersModel = mongoose.model('Parameters');
 var accessModel = mongoose.model('Access');
 
 api.dasboardAdmin = async function(req, res) {
-    console.log('aaaaaaaaaa')
-    console.log(req.user);
+
     if (!req.user.isAdmin) {
         res.status(401).json({ error: "Não autorizado" });
         return
