@@ -112,8 +112,6 @@ api.byNoEspecialidadeMunicipio = async function(req, res) {
     });
 
     let objMap = await MapsService.getLocaleFromDescription(req.params.municipio);
-
-    console.log(objMap);
     if (objMap) {
         await model.find({
             $and: [
