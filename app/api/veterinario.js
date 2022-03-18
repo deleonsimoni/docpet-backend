@@ -9,7 +9,7 @@ var especialidadeModel = mongoose.model('Especialidade');
 var point = {}
 
 api.lista = function(req, res) {
-    model.find({}).populate('especialidades').populate('estabelecimentos')
+    model.find({}).populate('especialidades').populate('estabelecimentos').sort({ dtCriacao: -1 })
         .then(function(veterinarios) {
             res.json(veterinarios);
         }, function(error) {

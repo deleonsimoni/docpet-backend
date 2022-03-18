@@ -8,7 +8,7 @@ var servico = mongoose.model('Servico');
 var point = {}
 
 api.lista = function(req, res) {
-    model.find({}).populate('veterinarios').populate('especialidades').populate('servicos')
+    model.find({}).populate('veterinarios').sort({ dtCriacao: -1 }).populate('especialidades').populate('servicos')
         .then(function(estabelecimentos) {
             res.json(estabelecimentos);
         }, function(error) {

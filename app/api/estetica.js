@@ -8,7 +8,7 @@ var Estabelecimento = mongoose.model('Estabelecimento');
 var point = {}
 
 api.lista = function(req, res) {
-    model.find({}).populate('especialidades').populate('estabelecimentos')
+    model.find({}).populate('especialidades').populate('estabelecimentos').sort({ dtCriacao: -1 })
         .then(function(esteticas) {
             res.json(esteticas);
         }, function(error) {

@@ -26,7 +26,7 @@ api.byNomeMunicipio = async function(req, res) {
 }
 
 api.lista = function(req, res) {
-    model.find({}).populate('especialidades').populate('estabelecimentos')
+    model.find({}).populate('especialidades').populate('estabelecimentos').sort({ dtCriacao: -1 })
         .then(function(adestradors) {
             res.json(adestradors);
         }, function(error) {
