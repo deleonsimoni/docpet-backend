@@ -94,7 +94,7 @@ module.exports = function(app) {
                     $group: {
                         "_id": "$_id",
                         "nome": { $first: "$nome" },
-                        "img": { $first: "$img" },
+                        //"img": { $first: "$img" },
                         "email": { $first: "$email" },
                         "role": { $first: "$role" },
                         "createdAt": { $first: "$createdAt" },
@@ -106,7 +106,7 @@ module.exports = function(app) {
                     $project: {
                         "_id": 1,
                         "nome": 1,
-                        "img": 1,
+                        //"img": 1,
                         "email": 1,
                         "role": 1,
                         "createdAt": 1,
