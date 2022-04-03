@@ -1,6 +1,10 @@
 mongoose = require('mongoose');
+
 const estabelecimento = require('../routes/estabelecimento');
 const MapsService = require('../services/service-maps');
+const UploadImg = require("../services/upload-img");
+
+var modelUpload = mongoose.model('Upload');
 
 var api = {};
 var model = mongoose.model('Veterinario');
@@ -8,8 +12,9 @@ var Estabelecimento = mongoose.model('Estabelecimento');
 var especialidadeModel = mongoose.model('Especialidade');
 var point = {}
 
+
 api.lista = function(req, res) {
-    model.find({}).populate('especialidades').populate('estabelecimentos').sort({ dtCriacao: -1 })
+    model.find({}).populate('avatar').populate('especialidades').populate('estabelecimentos').sort({ dtCriacao: -1 })
         .then(function(veterinarios) {
             res.json(veterinarios);
         }, function(error) {
@@ -17,6 +22,55 @@ api.lista = function(req, res) {
             res.status(500).json(error);
         });
 }
+
+api.listaImagem = async function(req, res) {
+    let i = 0;
+    model.find({ img: { $ne: null } }).then(async function(veterinarios) {
+        veterinarios.forEach(async element => {
+            console.log(i++);
+            const file = await UploadImg.imageUpload(element.img);
+            modelUpload.create({
+                name: file.key,
+                size: file.size,
+                key: file.key,
+                url: file.location,
+
+            }).then(async function(upload) {
+                id = element._id
+                await model.findOneAndUpdate({ _id: id }, { avatar: upload._id, img: null }, { new: true }).then(async function(vet) {
+                    //res.json(vet);
+                }, function(error) {
+                    console.log(error);
+                    res.status(500).json(error);
+                });
+
+            }, function(error) {
+                console.log(error);
+                res.status(500).json(error);
+            });
+        });
+        res.status(200);
+    }, function(error) {
+        console.log(error);
+        res.status(500).json(error);
+    });
+}
+
+function dataURLtoFile(dataurl, filename) {
+
+    var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], filename, { type: mime });
+}
+
 
 api.listaTodosReview = function(req, res) {
         model.find({
@@ -28,7 +82,7 @@ api.listaTodosReview = function(req, res) {
                 }
             }).sort({
                 'reviews.score': -1
-            }).populate('especialidades').populate('estabelecimentos')
+            }).populate('especialidades').populate('estabelecimentos').populate('avatar')
             .then(function(veterinarios) {
                 console.log(veterinarios.length)
                 res.json(veterinarios);
@@ -50,6 +104,7 @@ api.byName = function(req, res) {
                 select: 'nome'
             }
         })
+        .populate('avatar')
         .then(function(veterinario) {
             res.json(veterinario);
         }, function(error) {
@@ -58,7 +113,7 @@ api.byName = function(req, res) {
         });
 }
 api.byEspecialidade = function(req, res) {
-    model.find({ especialidades: req.params.id }).populate('especialidades').populate('estabelecimentos')
+    model.find({ especialidades: req.params.id }).populate('especialidades').populate('estabelecimentos').populate('avatar')
         .then(function(veterinarios) {
             res.json(veterinarios);
         }, function(error) {
@@ -91,6 +146,7 @@ api.byEspecialidadeMunicipio = async function(req, res) {
 
     .populate('especialidades')
         .populate('estabelecimentos')
+        .populate('avatar')
         .then(function(veterinarios) {
             res.json(veterinarios);
         }, function(error) {
@@ -133,6 +189,7 @@ api.byNoEspecialidadeMunicipio = async function(req, res) {
 
         .populate('especialidades')
             .populate('estabelecimentos')
+            .populate('avatar')
             .then(function(veterinarios) {
                 res.json(veterinarios);
             }, function(error) {
@@ -168,6 +225,7 @@ api.byNomeEspecialidadeMunicipio = async function(req, res) {
         })
         .populate('especialidades')
         .populate('estabelecimentos')
+        .populate('avatar')
         .then(function(veterinarios) {
             res.json(veterinarios);
         }, function(error) {
@@ -177,7 +235,7 @@ api.byNomeEspecialidadeMunicipio = async function(req, res) {
 }
 
 api.buscaPorId = function(req, res) {
-    model.findById(req.params.id).populate('estabelecimentos').populate('especialidades')
+    model.findById(req.params.id).populate('avatar').populate('estabelecimentos').populate('especialidades')
         .then(function(veterinario) {
             if (!veterinario) throw Error('Veterinário não localizado');
             res.json(veterinario);
@@ -188,7 +246,7 @@ api.buscaPorId = function(req, res) {
 }
 
 api.buscaPorUsuario = function(req, res) {
-    model.findOne({ user: req.params.id }).populate('estabelecimentos').populate('especialidades')
+    model.findOne({ user: req.params.id }).populate('estabelecimentos').populate('especialidades').populate('avatar')
         .then(function(veterinario) {
             if (!veterinario) throw Error('Veterinário não localizado');
             res.json(veterinario);
@@ -199,7 +257,7 @@ api.buscaPorUsuario = function(req, res) {
 }
 
 api.buscaPorCRMV = function(req, res) {
-    model.findOne({ crmv: req.params.crmv })
+    model.findOne({ crmv: req.params.crmv }).populate('avatar')
         .then(async function(veterinario) {
             res.json(veterinario);
         }, function(error) {
@@ -216,13 +274,48 @@ api.locale = async function(req, res) {
     return res.json(await MapsService.getLocale(req.params.search));
 };
 
+api.checkChangerAvatar = async function(avatar, idVet) {
+    let vet = null;
+    let avatarBd = null;
+    //console.log(idVet);
+    //console.log(avatar);
+
+    if (!avatar) {
+        return false;
+    }
+
+    await model.findById(idVet).populate('avatar').then(function(veterinario) {
+        if (!veterinario) throw Error('Veterinário não localizado');
+        vet = veterinario;
+    }, function(error) {
+        console.log(error);
+        res.status(404).json(error);
+    })
+    let idAvatar = avatar._id;
+
+    await modelUpload.findOne({ idAvatar }).then(function(obj) {
+        avatarBd = obj;
+
+    }, function(error) {
+        console.log(error);
+        res.status(500).json(error);
+    });
+
+    console.log(vet.avatar);
+
+    if (vet.avatar && vet.avatar._id != avatar._id) {
+        await UploadImg.removeImg(vet.avatar._id).
+        console.log('Não faz nada');
+    }
+}
+
 api.adiciona = async function(req, res) {
 
     if (!req.body) {
         req.body = req;
     }
 
-    const { nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, img, uf } = req.body;
+    const { nome, crmv, contato, endereco, atendePlano, especialidades, estabelecimentos, status, sobre, formacoes, experiencias, conquistas, uf, avatar } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -236,8 +329,8 @@ api.adiciona = async function(req, res) {
         formacoes: formacoes,
         experiencias: experiencias,
         conquistas: conquistas,
-        img: img,
-        uf: uf
+        uf: uf,
+        avatar: avatar
     }
 
     if (req.id) {
@@ -301,7 +394,7 @@ api.adiciona = async function(req, res) {
 
 api.atualiza = async function(req, res) {
     const _id = req.params.id;
-    const { nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, img, uf } = req.body;
+    const { nome, crmv, contato, endereco, atendePlano, especialidades, status, estabelecimentos, sobre, formacoes, experiencias, conquistas, uf, avatar } = req.body;
 
     let veterinarioForm = {
         nome: nome,
@@ -316,8 +409,8 @@ api.atualiza = async function(req, res) {
         formacoes: formacoes,
         experiencias: experiencias,
         conquistas: conquistas,
-        img: img,
         uf: uf,
+        avatar: avatar
 
     }
 
@@ -364,6 +457,8 @@ api.atualiza = async function(req, res) {
 
         }
     }));
+
+    api.checkChangerAvatar(veterinarioForm.avatar, _id);
 
     await model.findOneAndUpdate({ _id }, veterinarioForm, { new: true }).then(async function(vet) {
         res.json(vet);

@@ -10,10 +10,10 @@ var schema = mongoose.Schema({
         default: Date.now,
     }
 });
-schema.pre('save', function() {
+/*schema.pre('save', function() {
     if (!this.url) {
         this.url = `${process.env.APP_URL}/files/${this.key}`
     }
-});
+}); */
 
 mongoose.model('Upload', schema);

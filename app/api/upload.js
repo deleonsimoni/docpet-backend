@@ -23,7 +23,6 @@ api.lista = async function(req, res) {
 
 api.adiciona = async function(req, res) {
     const arquivo = { originalname: name, size, key, location: url = '' } = req.file;
-    console.log(req.file);
 
     post = await modelUpload.create({
         name,
@@ -55,14 +54,12 @@ api.remove = async function(req, res) {
                         console.log(pathDir);
                     })
                 } else if (process.env.STORAGE_TYPE === 's3') {
-                    ///return s3.deleteObject({
-                    //   bucket: 'vetzco-img',
-                    //   key: arquivo.key,
-
-                    // }).promise();
+                    return s3.deleteObject({
+                        bucket: 'vetzco-img',
+                        key: arquivo.key,
+                    }).promise();
                 }
                 res.sendStatus(204);
-
             },
             function(error) {
                 console.log(error);

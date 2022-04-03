@@ -9,12 +9,4 @@ module.exports = function(app) {
 
     app.route('/v1/upload/:id')
         .delete(api.remove)
-        /*app.route('/v1/upload').post(multer(multerConfig).single('file'), (req, res) => {
-            console.log(req.file);
-            return res.json({ retorno: "Sucesso" });
-
-        })*/
-
-
-    //app.route('/v1/upload').post(api.adiciona);
 }

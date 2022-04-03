@@ -53,11 +53,13 @@ module.exports = {
             'image/jpeg',
             'image/pjpeg',
             'image/png',
-            'image/gif'
+            'image/gif',
+            'image/webp'
         ];
-        if (allowedMimes.indexOf(file.mimetype) - 1) {
-            cb(new Error("Tipo de Arquivo inválido"));
+        if (!allowedMimes.includes(file.mimetype)) {
+            cb(new Error("Tipo de Arquivo inválido " + file.mimetype));
         }
+
         cb(null, true);
     },
 }
