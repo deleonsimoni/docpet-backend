@@ -38,6 +38,10 @@ var schema = mongoose.Schema({
     place:{
         type:String, 
     },
+    datePost: {
+        type: Date,
+        default: Date.now,
+    },
     reviews:[{
         createdAt: {
             type: Date,

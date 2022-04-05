@@ -185,10 +185,6 @@ var schema = mongoose.Schema({
             type: Date,
             default: Date.now,
         },
-        datePost: {
-            type: Date,
-            default: Date.now,
-        },
         score: {
             type: Number
         },
