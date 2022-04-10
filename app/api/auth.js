@@ -18,6 +18,8 @@ module.exports = function(app) {
     var esteticaService = require('./estetica.js');
 
     var estabelecimentoService = require('./estabelecimento.js');
+    const UploadImg = require("../services/upload-img");
+    var modelUpload = mongoose.model('Upload');
 
 
     api.createUser = async function(req, res) {
@@ -70,6 +72,39 @@ module.exports = function(app) {
 
     }
 
+    api.listaImagem = async function(req, res) {
+        let i = 0;
+        model.find({ img: { $ne: null } }).then(async function(usuarios) {
+            usuarios.forEach(async element => {
+                console.log(i++);
+                const file = await UploadImg.imageUpload(element.img);
+                modelUpload.create({
+                    name: file.key,
+                    size: file.size,
+                    key: file.key,
+                    url: file.location,
+
+                }).then(async function(upload) {
+                    id = element._id
+                    await model.findOneAndUpdate({ _id: id }, { avatar: upload._id, img: null }, { new: true }).then(async function(vet) {
+                        //res.json(vet);
+                    }, function(error) {
+                        console.log(error);
+                        res.status(500).json(error);
+                    });
+
+                }, function(error) {
+                    console.log(error);
+                    res.status(500).json(error);
+                });
+            });
+            res.status(200);
+        }, function(error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
+    }
+
     api.getUsers = async function(req, res) {
 
         if (!req.user.isAdmin) {
@@ -94,19 +129,21 @@ module.exports = function(app) {
                     $group: {
                         "_id": "$_id",
                         "nome": { $first: "$nome" },
-                        //"img": { $first: "$img" },
                         "email": { $first: "$email" },
                         "role": { $first: "$role" },
                         "createdAt": { $first: "$createdAt" },
                         "isAdmin": { $first: "$isAdmin" },
-                        "lastLogin": { $first: "$accesses.dateAccess" }
+                        "lastLogin": { $first: "$accesses.dateAccess" },
+                        avatar: {
+                            $push: '$avatar'
+                        }
                     }
                 },
                 {
                     $project: {
                         "_id": 1,
                         "nome": 1,
-                        //"img": 1,
+                        "avatar": 1,
                         "email": 1,
                         "role": 1,
                         "createdAt": 1,
@@ -116,7 +153,7 @@ module.exports = function(app) {
                 },
 
             ]).exec()
-
+            console.log()
             res.status(200).json({ users: users });
         } catch (err) {
             console.log('Erro não esperado ao salvar usuário ' + err);
@@ -229,7 +266,7 @@ module.exports = function(app) {
     api.autentica = async function(req, res) {
 
 
-        model.findOne({ email: req.body.email })
+        model.findOne({ email: req.body.email }).populate('avatar')
             .then(function(usuario) {
                 if (!usuario) {
                     console.log('Login e senha inválidos 1');
@@ -240,10 +277,9 @@ module.exports = function(app) {
                         console.log('Login e senha inválidos 2');
                         res.sendStatus(401);
                     } else {
-
                         accessService.markAccessProfile(usuario.role, usuario._id);
 
-                        var token = jwt.sign({ id: usuario._id, login: usuario.nome, role: usuario.role, isAdmin: usuario.isAdmin }, process.env.SECRET, {
+                        var token = jwt.sign({ id: usuario._id, login: usuario.nome, role: usuario.role, isAdmin: usuario.isAdmin, avatar: usuario.avatar }, process.env.SECRET, {
                             expiresIn: 84600
                         });
 
@@ -251,6 +287,7 @@ module.exports = function(app) {
                     }
 
                 }
+
             }, function(error) {
                 console.log('Login e senha inválidos');
                 res.sendStatus(401)

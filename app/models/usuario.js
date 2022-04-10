@@ -8,6 +8,10 @@ var schema = mongoose.Schema({
     img: {
         type: String,
     },
+    avatar: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Upload'
+    },
     email: {
         type: String,
         required: true,

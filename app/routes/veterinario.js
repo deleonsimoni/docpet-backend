@@ -44,6 +44,9 @@ module.exports = function(app) {
     app.route('/v1/veterinarios/review/:id')
         .get(api.getReview)
         .post(api.createReview);
+
+    app.route('/v1/veterinarios-imagens').get(api.listaImagem);
+
     /*.delete(api.removePorId)
     .put(api.atualiza);*/
 }
